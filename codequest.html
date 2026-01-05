@@ -1,0 +1,3248 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeQuest Pro - JavaScript冒険</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@600;700&family=Orbitron:wght@400;700&display=swap');
+        
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #141b2d;
+            --bg-tertiary: #1e2a45;
+            --bg-card: #182035;
+            --accent-primary: #00f5ff;
+            --accent-secondary: #ff2d75;
+            --accent-tertiary: #b14eff;
+            --accent-success: #00ff88;
+            --accent-warning: #ffcc00;
+            --accent-orange: #ff7b00;
+            --text-primary: #e8f4f8;
+            --text-secondary: #8892b0;
+            --text-code: #7dd3fc;
+            --glow-primary: rgba(0, 245, 255, 0.5);
+            --glow-secondary: rgba(255, 45, 117, 0.5);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Space Mono', monospace;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Animated starfield background */
+        .starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        
+        /* Nebula effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(177, 78, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(0, 245, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(255, 45, 117, 0.08) 0%, transparent 60%);
+            animation: nebulaPulse 15s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        @keyframes nebulaPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            animation: fadeInDown 0.8s ease;
+        }
+        
+        .logo-container {
+            display: inline-block;
+            position: relative;
+        }
+        
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-tertiary) 50%, var(--accent-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 0.1em;
+            position: relative;
+            animation: logoGlow 3s ease-in-out infinite;
+        }
+        
+        @keyframes logoGlow {
+            0%, 100% { 
+                filter: drop-shadow(0 0 20px var(--glow-primary)) drop-shadow(0 0 40px var(--glow-secondary));
+            }
+            50% { 
+                filter: drop-shadow(0 0 30px var(--glow-primary)) drop-shadow(0 0 60px var(--glow-secondary));
+            }
+        }
+        
+        .subtitle {
+            font-family: 'Fredoka', sans-serif;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            letter-spacing: 0.3em;
+            margin-top: 0.5rem;
+        }
+        
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            border: 1px solid rgba(0, 245, 255, 0.2);
+        }
+        
+        .stat-icon {
+            font-size: 1.2rem;
+        }
+        
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--accent-primary);
+            font-weight: 700;
+        }
+        
+        .help-link {
+            text-decoration: none;
+            color: var(--accent-warning);
+            border: 1px solid var(--accent-warning);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .help-link:hover {
+            background: var(--accent-warning);
+            color: var(--bg-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 204, 0, 0.3);
+        }
+        
+        .theme-toggle, .character-btn {
+            cursor: pointer;
+            border: 1px solid var(--accent-tertiary);
+            color: var(--accent-tertiary);
+            transition: all 0.3s ease;
+        }
+        
+        .theme-toggle:hover, .character-btn:hover {
+            background: var(--accent-tertiary);
+            color: var(--bg-primary);
+            transform: translateY(-2px);
+        }
+        
+        /* Character Selector Modal */
+        .character-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .character-modal.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .character-modal-content {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            border: 2px solid var(--accent-primary);
+            box-shadow: 0 20px 60px rgba(0, 245, 255, 0.3);
+        }
+        
+        .character-modal h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--accent-primary);
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .character-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .character-card {
+            background: var(--bg-secondary);
+            border: 3px solid var(--bg-tertiary);
+            border-radius: 16px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .character-card:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 245, 255, 0.2);
+        }
+        
+        .character-card.selected {
+            border-color: var(--accent-success);
+            background: rgba(0, 255, 136, 0.1);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+        
+        .character-preview {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 0.75rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .character-name {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .character-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        .character-modal-close {
+            display: block;
+            width: 100%;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-tertiary));
+            color: var(--bg-primary);
+            border: none;
+            border-radius: 10px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .character-modal-close:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 245, 255, 0.4);
+        }
+        
+        /* ===== LIGHT MODE ===== */
+        body.light-mode {
+            --bg-primary: #e8ecf2;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #d1d9e6;
+            --bg-card: #ffffff;
+            --text-primary: #1a202c;
+            --text-secondary: #374151;
+            --text-code: #7c3aed;
+            --grid-color: #94a3b8;
+            --border-color: #cbd5e1;
+            --accent-primary: #0891b2;
+            --accent-secondary: #db2777;
+            --accent-tertiary: #7c3aed;
+            --accent-success: #10b981;
+            --accent-warning: #f59e0b;
+        }
+        
+        body.light-mode::before {
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(0, 180, 220, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(147, 51, 234, 0.12) 0%, transparent 50%);
+        }
+        
+        body.light-mode .starfield .star {
+            background: rgba(100, 116, 139, 0.3);
+        }
+        
+        body.light-mode .panel {
+            box-shadow: 
+                0 4px 20px rgba(0, 0, 0, 0.08),
+                0 0 0 1px rgba(0, 0, 0, 0.06);
+            border: 1px solid var(--border-color);
+        }
+        
+        body.light-mode .panel::before {
+            background: linear-gradient(90deg, #0891b2, #7c3aed);
+        }
+        
+        body.light-mode canvas {
+            background: #f1f5f9;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 2px solid #cbd5e1;
+        }
+        
+        body.light-mode .code-editor textarea {
+            background: #1e293b;
+            color: #e879f9;
+            border: 2px solid #475569;
+        }
+        
+        body.light-mode .output {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            color: #1e293b;
+        }
+        
+        body.light-mode .hint-box {
+            background: rgba(251, 191, 36, 0.15);
+            border-color: #f59e0b;
+        }
+        
+        body.light-mode .level-btn {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+            color: #475569;
+        }
+        
+        body.light-mode .level-btn:hover {
+            border-color: #0891b2;
+            color: #0891b2;
+            background: #e0f2fe;
+        }
+        
+        body.light-mode .level-btn.active {
+            background: linear-gradient(135deg, #0891b2, #7c3aed);
+            color: white;
+            border-color: #0891b2;
+        }
+        
+        body.light-mode .world-btn {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+            color: #475569;
+        }
+        
+        body.light-mode .world-btn:hover {
+            border-color: #0891b2;
+            color: #0891b2;
+        }
+        
+        body.light-mode .world-btn.active {
+            background: linear-gradient(135deg, #0891b2, #7c3aed);
+            color: white;
+        }
+        
+        body.light-mode .stat-item {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+        }
+        
+        body.light-mode .challenge-description {
+            background: #f8fafc;
+            border-left-color: #7c3aed;
+            color: #1e293b;
+        }
+        
+        body.light-mode .challenge-description code {
+            background: #e0e7ff;
+            color: #4338ca;
+        }
+        
+        body.light-mode .success-message {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: #10b981;
+            color: #047857;
+        }
+        
+        body.light-mode .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
+            color: #dc2626;
+        }
+        
+        body.light-mode .character-modal-content {
+            background: #ffffff;
+            border-color: #0891b2;
+        }
+        
+        body.light-mode .character-card {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+        
+        body.light-mode .character-card:hover {
+            border-color: #0891b2;
+            background: #e0f2fe;
+        }
+        
+        body.light-mode .character-card.selected {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+        
+        body.light-mode .quick-ref-panel {
+            background: #ffffff;
+            border-color: #cbd5e1;
+        }
+        
+        body.light-mode .floating-help-btn {
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        body.light-mode .panel-title {
+            color: #0891b2;
+        }
+        
+        body.light-mode .game-info {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+        }
+        
+        body.light-mode .info-item .label {
+            color: #475569;
+        }
+        
+        body.light-mode .run-btn {
+            background: linear-gradient(135deg, #0891b2, #0e7490);
+            box-shadow: 0 4px 12px rgba(8, 145, 178, 0.3);
+        }
+        
+        body.light-mode .level-complete-modal {
+            background: #ffffff;
+            border-color: #0891b2;
+        }
+        
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 1.5rem;
+            animation: fadeInUp 0.8s ease 0.2s backwards;
+        }
+        
+        .panel {
+            background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 
+                0 10px 40px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(0, 245, 255, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-tertiary), var(--accent-secondary));
+        }
+        
+        .panel::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 20px;
+            background: linear-gradient(180deg, rgba(0, 245, 255, 0.2) 0%, transparent 100%);
+            border-radius: 0 0 50% 50%;
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .panel-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            color: var(--accent-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        
+        .world-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .world-btn {
+            padding: 0.4rem 0.8rem;
+            border: 2px solid var(--bg-tertiary);
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+        
+        .world-btn:hover {
+            border-color: var(--accent-tertiary);
+            color: var(--accent-tertiary);
+        }
+        
+        .world-btn.active {
+            background: linear-gradient(135deg, var(--accent-tertiary), var(--accent-secondary));
+            border-color: var(--accent-tertiary);
+            color: white;
+        }
+        
+        .level-selector {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .level-btn {
+            padding: 0.5rem;
+            border: 2px solid var(--bg-tertiary);
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.75rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .level-btn:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 245, 255, 0.2);
+        }
+        
+        .level-btn.active {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-tertiary));
+            border-color: var(--accent-primary);
+            color: var(--bg-primary);
+            box-shadow: 0 0 20px var(--glow-primary);
+        }
+        
+        .level-btn.completed {
+            background: linear-gradient(135deg, var(--accent-success), #00cc6a);
+            border-color: var(--accent-success);
+            color: var(--bg-primary);
+        }
+        
+        .level-btn .stars {
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.6rem;
+            white-space: nowrap;
+        }
+        
+        .challenge-box {
+            background: var(--bg-tertiary);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--accent-secondary);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .challenge-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(255, 45, 117, 0.1) 0%, transparent 70%);
+        }
+        
+        .challenge-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: var(--accent-warning);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .challenge-description {
+            line-height: 1.6;
+            font-size: 0.9rem;
+        }
+        
+        .challenge-description code {
+            background: var(--bg-primary);
+            color: var(--text-code);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Space Mono', monospace;
+        }
+        
+        .new-concept {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-tertiary), var(--accent-secondary));
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-left: 0.5rem;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(177, 78, 255, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(177, 78, 255, 0); }
+        }
+        
+        .code-editor-container {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+        
+        .editor-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .editor-tab {
+            padding: 0.4rem 1rem;
+            background: var(--bg-tertiary);
+            border: none;
+            border-radius: 8px 8px 0 0;
+            color: var(--text-secondary);
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .editor-tab.active {
+            background: var(--bg-primary);
+            color: var(--accent-primary);
+        }
+        
+        .code-editor {
+            position: relative;
+            background: var(--bg-primary);
+            border-radius: 0 12px 12px 12px;
+            overflow: hidden;
+            border: 2px solid var(--bg-tertiary);
+            transition: border-color 0.3s ease;
+        }
+        
+        .code-editor:focus-within {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.1);
+        }
+        
+        .line-numbers {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3rem;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--bg-tertiary);
+            padding: 1rem 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            user-select: none;
+            line-height: 1.5;
+            text-align: right;
+            overflow: hidden;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 220px;
+            background: transparent;
+            color: var(--text-code);
+            border: none;
+            padding: 1rem 1rem 1rem 4rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            resize: none;
+            line-height: 1.5;
+        }
+        
+        textarea:focus {
+            outline: none;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        
+        button {
+            padding: 0.75rem 1.25rem;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .run-btn {
+            background: linear-gradient(135deg, var(--accent-primary), #00b8c8);
+            color: var(--bg-primary);
+            flex: 1;
+            box-shadow: 0 4px 15px rgba(0, 245, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .run-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 245, 255, 0.4);
+        }
+        
+        .run-btn:active {
+            transform: translateY(0);
+        }
+        
+        .hint-btn {
+            background: var(--bg-tertiary);
+            color: var(--accent-warning);
+            border: 2px solid var(--accent-warning);
+        }
+        
+        .hint-btn:hover {
+            background: var(--accent-warning);
+            color: var(--bg-primary);
+        }
+        
+        .reset-btn {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: 2px solid var(--text-secondary);
+        }
+        
+        .reset-btn:hover {
+            background: var(--accent-secondary);
+            border-color: var(--accent-secondary);
+            color: white;
+        }
+        
+        .hint-box {
+            background: linear-gradient(135deg, rgba(255, 204, 0, 0.1), rgba(255, 123, 0, 0.1));
+            border: 2px solid var(--accent-warning);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .hint-box.show {
+            display: block;
+        }
+        
+        .hint-box code {
+            display: block;
+            background: var(--bg-primary);
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-top: 0.5rem;
+            color: var(--text-code);
+            font-size: 0.85rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+        
+        .output {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 1rem;
+            min-height: 80px;
+            max-height: 120px;
+            overflow-y: auto;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            border: 1px solid var(--bg-tertiary);
+        }
+        
+        .output p {
+            margin: 0.25rem 0;
+            padding-left: 0.5rem;
+            border-left: 2px solid var(--accent-primary);
+        }
+        
+        .canvas-container {
+            background: linear-gradient(180deg, #0d1321 0%, #151d32 100%);
+            border-radius: 16px;
+            padding: 1rem;
+            position: relative;
+            border: 2px solid var(--bg-tertiary);
+            overflow: hidden;
+        }
+        
+        .canvas-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 30% 30%, rgba(0, 245, 255, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 70% 70%, rgba(177, 78, 255, 0.05) 0%, transparent 40%);
+            pointer-events: none;
+        }
+        
+        canvas {
+            display: block;
+            margin: 0 auto;
+            border-radius: 8px;
+            box-shadow: 
+                0 0 30px rgba(0, 0, 0, 0.5),
+                inset 0 0 50px rgba(0, 245, 255, 0.03);
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+        }
+        
+        .game-info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .game-info-item .icon {
+            font-size: 1.2rem;
+        }
+        
+        .game-info-item .value {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--accent-primary);
+            font-weight: 700;
+        }
+        
+        .success-message {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 204, 106, 0.2));
+            border: 2px solid var(--accent-success);
+            color: var(--accent-success);
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 700;
+            animation: successPop 0.5s ease;
+            margin-top: 1rem;
+        }
+        
+        .error-message {
+            background: linear-gradient(135deg, rgba(255, 45, 117, 0.2), rgba(255, 45, 117, 0.1));
+            border: 2px solid var(--accent-secondary);
+            color: var(--accent-secondary);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+        }
+        
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes successPop {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        /* Celebration effects */
+        .celebration-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+            overflow: hidden;
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            animation: confettiFall 3s linear forwards;
+        }
+        
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        
+        .level-complete-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 14, 23, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .level-complete-modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+            padding: 2.5rem;
+            border-radius: 24px;
+            text-align: center;
+            max-width: 400px;
+            border: 2px solid var(--accent-success);
+            box-shadow: 0 0 60px rgba(0, 255, 136, 0.3);
+            animation: modalPop 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes modalPop {
+            0% { transform: scale(0.5); opacity: 0; }
+            70% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .modal-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            color: var(--accent-success);
+            margin-bottom: 1rem;
+        }
+        
+        .modal-stars {
+            font-size: 3rem;
+            margin: 1rem 0;
+        }
+        
+        .modal-message {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-btn {
+            background: linear-gradient(135deg, var(--accent-success), #00cc6a);
+            color: var(--bg-primary);
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+        
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 255, 136, 0.4);
+        }
+        
+        /* Quick Reference Panel */
+        .quick-ref-panel {
+            position: fixed;
+            right: -350px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 320px;
+            max-height: 80vh;
+            background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+            border-radius: 20px 0 0 20px;
+            box-shadow: -5px 0 30px rgba(0, 0, 0, 0.5);
+            z-index: 998;
+            transition: right 0.4s ease;
+            overflow: hidden;
+            border: 1px solid rgba(0, 245, 255, 0.2);
+            border-right: none;
+        }
+        
+        .quick-ref-panel.open {
+            right: 0;
+        }
+        
+        .quick-ref-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .quick-ref-header h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: var(--accent-primary);
+            margin: 0;
+        }
+        
+        .quick-ref-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .quick-ref-close:hover {
+            background: var(--accent-secondary);
+            color: white;
+        }
+        
+        .quick-ref-content {
+            padding: 1rem 1.25rem;
+            overflow-y: auto;
+            max-height: calc(80vh - 60px);
+        }
+        
+        .quick-ref-section {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .quick-ref-section:last-of-type {
+            border-bottom: none;
+        }
+        
+        .quick-ref-section h4 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.9rem;
+            color: var(--accent-warning);
+            margin-bottom: 0.5rem;
+        }
+        
+        .quick-ref-section code {
+            display: inline-block;
+            background: var(--bg-primary);
+            color: var(--text-code);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin: 0.15rem 0;
+        }
+        
+        .full-ref-link {
+            display: block;
+            text-align: center;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-tertiary));
+            color: var(--bg-primary);
+            text-decoration: none;
+            border-radius: 10px;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .full-ref-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 245, 255, 0.3);
+        }
+        
+        /* Floating Help Button */
+        .floating-help-btn {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-tertiary), var(--accent-secondary));
+            border: none;
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            z-index: 997;
+            box-shadow: 0 4px 20px rgba(177, 78, 255, 0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .floating-help-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(177, 78, 255, 0.6);
+        }
+        
+        .floating-help-btn.active {
+            background: linear-gradient(135deg, var(--accent-secondary), var(--accent-tertiary));
+            transform: rotate(45deg);
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-primary);
+        }
+        
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .level-selector {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .level-selector {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .stats-bar {
+                gap: 0.5rem;
+            }
+            
+            .stat-item {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="starfield" id="starfield"></div>
+    
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <h1>⚡ CODEQUEST PRO</h1>
+            </div>
+            <p class="subtitle">JavaScript マスターへの道</p>
+            
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <span class="stat-icon">🏆</span>
+                    <span>クリア:</span>
+                    <span class="stat-value" id="completedCount">0</span>
+                    <span>/80</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">⭐</span>
+                    <span>スター:</span>
+                    <span class="stat-value" id="totalStars">0</span>
+                </div>
+                <button class="stat-item theme-toggle" id="themeToggle" title="テーマ切替">
+                    <span class="stat-icon" id="themeIcon">🌙</span>
+                    <span id="themeText">ダーク</span>
+                </button>
+                <button class="stat-item character-btn" id="characterBtn" title="キャラクター選択">
+                    <span class="stat-icon">🤖</span>
+                    <span>キャラ</span>
+                </button>
+                <a href="codequest-reference.html" class="stat-item help-link">
+                    <span class="stat-icon">📖</span>
+                    <span>リファレンス</span>
+                </a>
+            </div>
+        </header>
+        
+        <div class="main-grid">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">📝 コードエディタ</h2>
+                </div>
+                
+                <div class="world-selector" id="worldSelector">
+                    <button class="world-btn active" data-world="1">🌍 基礎</button>
+                    <button class="world-btn" data-world="2">🔁 ループ</button>
+                    <button class="world-btn" data-world="3">🔀 条件</button>
+                    <button class="world-btn" data-world="4">⚙️ 関数</button>
+                </div>
+                
+                <div class="level-selector" id="levelSelector"></div>
+                
+                <div class="challenge-box">
+                    <div class="challenge-title" id="challengeTitle">
+                        <span>🎯 ミッション</span>
+                    </div>
+                    <div class="challenge-description" id="challengeDescription"></div>
+                </div>
+                
+                <div class="hint-box" id="hintBox"></div>
+                
+                <div class="code-editor-container">
+                    <div class="editor-tabs">
+                        <button class="editor-tab active">main.js</button>
+                    </div>
+                    <div class="code-editor">
+                        <div class="line-numbers" id="lineNumbers">1</div>
+                        <textarea id="codeInput" spellcheck="false"></textarea>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button class="run-btn" id="runBtn">
+                        <span>▶</span>
+                        <span>実行</span>
+                    </button>
+                    <button class="hint-btn" id="hintBtn">💡</button>
+                    <button class="reset-btn" id="resetBtn">↺</button>
+                </div>
+                
+                <div class="output" id="output"></div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">🎮 シミュレーター</h2>
+                </div>
+                
+                <div class="canvas-container">
+                    <canvas id="gameCanvas" width="580" height="420"></canvas>
+                </div>
+                
+                <div class="game-info">
+                    <div class="game-info-item">
+                        <span class="icon">🤖</span>
+                        <span>位置:</span>
+                        <span class="value" id="robotPos">(0, 0)</span>
+                    </div>
+                    <div class="game-info-item">
+                        <span class="icon">⭐</span>
+                        <span>収集:</span>
+                        <span class="value" id="starsCollected">0</span>
+                    </div>
+                    <div class="game-info-item">
+                        <span class="icon">💎</span>
+                        <span>ジェム:</span>
+                        <span class="value" id="gemsCollected">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="celebration-container" id="celebrationContainer"></div>
+    
+    <div class="level-complete-modal" id="levelCompleteModal">
+        <div class="modal-content">
+            <h2 class="modal-title">🎉 クリア!</h2>
+            <div class="modal-stars" id="modalStars">⭐⭐⭐</div>
+            <p class="modal-message" id="modalMessage">素晴らしい! 次のレベルに挑戦しよう!</p>
+            <button class="modal-btn" id="nextLevelBtn">次へ進む →</button>
+        </div>
+    </div>
+    
+    <!-- Quick Reference Panel -->
+    <div class="quick-ref-panel" id="quickRefPanel">
+        <div class="quick-ref-header">
+            <h3>📖 クイックリファレンス</h3>
+            <button class="quick-ref-close" id="closeQuickRef">✕</button>
+        </div>
+        <div class="quick-ref-content">
+            <div class="quick-ref-section">
+                <h4>🚶 移動</h4>
+                <code>robot.move()</code> - 右に1マス<br>
+                <code>robot.moveUp()</code> - 上に1マス<br>
+                <code>robot.moveDown()</code> - 下に1マス<br>
+                <code>robot.jump()</code> - ジャンプ（障害物越え）
+            </div>
+            <div class="quick-ref-section">
+                <h4>⭐ 収集</h4>
+                <code>robot.collect()</code> - 星を収集<br>
+                <code>robot.collectGem()</code> - ジェムを収集
+            </div>
+            <div class="quick-ref-section">
+                <h4>🔍 チェック</h4>
+                <code>robot.isObstacle()</code> - 前方に障害物?<br>
+                <code>robot.isStar()</code> - 星がある?<br>
+                <code>robot.isGem()</code> - ジェムがある?<br>
+                <code>robot.isGoal()</code> - ゴール?
+            </div>
+            <div class="quick-ref-section">
+                <h4>📊 状態</h4>
+                <code>robot.x</code> - X座標<br>
+                <code>robot.y</code> - Y座標<br>
+                <code>robot.starsCollected</code> - 星の数
+            </div>
+            <a href="codequest-reference.html" class="full-ref-link">📚 詳しいリファレンスを見る →</a>
+        </div>
+    </div>
+    
+    <!-- Floating Help Button -->
+    <button class="floating-help-btn" id="floatingHelpBtn" title="クイックリファレンス">
+        <span>?</span>
+    </button>
+    
+    <!-- Character Selection Modal -->
+    <div class="character-modal" id="characterModal">
+        <div class="character-modal-content">
+            <h2>🤖 キャラクター選択</h2>
+            <div class="character-grid" id="characterGrid">
+                <!-- Characters will be added by JavaScript -->
+            </div>
+            <button class="character-modal-close" id="closeCharacterModal">決定</button>
+        </div>
+    </div>
+
+    <script>
+        // ===== CHARACTERS =====
+        const characters = [
+            {
+                id: 'pixel',
+                name: 'Pixel',
+                desc: 'クラシックロボット',
+                colors: {
+                    body: '#00f5ff',
+                    bodyGlow: '#00d4dd',
+                    eye: '#00ff88',
+                    antenna: '#ff2d75',
+                    chest: ['#ff2d75', '#00ff88', '#ffcc00']
+                }
+            },
+            {
+                id: 'blaze',
+                name: 'Blaze',
+                desc: '炎のロボット',
+                colors: {
+                    body: '#ff6b35',
+                    bodyGlow: '#ff4500',
+                    eye: '#ffcc00',
+                    antenna: '#ff0000',
+                    chest: ['#ff0000', '#ff6b35', '#ffcc00']
+                }
+            },
+            {
+                id: 'nova',
+                name: 'Nova',
+                desc: '宇宙ロボット',
+                colors: {
+                    body: '#b14eff',
+                    bodyGlow: '#9333ea',
+                    eye: '#00ffff',
+                    antenna: '#ff00ff',
+                    chest: ['#ff00ff', '#00ffff', '#b14eff']
+                }
+            },
+            {
+                id: 'leaf',
+                name: 'Leaf',
+                desc: '自然ロボット',
+                colors: {
+                    body: '#22c55e',
+                    bodyGlow: '#16a34a',
+                    eye: '#a3e635',
+                    antenna: '#84cc16',
+                    chest: ['#22c55e', '#84cc16', '#a3e635']
+                }
+            },
+            {
+                id: 'frost',
+                name: 'Frost',
+                desc: '氷のロボット',
+                colors: {
+                    body: '#38bdf8',
+                    bodyGlow: '#0ea5e9',
+                    eye: '#ffffff',
+                    antenna: '#e0f2fe',
+                    chest: ['#bae6fd', '#7dd3fc', '#38bdf8']
+                }
+            },
+            {
+                id: 'shadow',
+                name: 'Shadow',
+                desc: '影のロボット',
+                colors: {
+                    body: '#6b7280',
+                    bodyGlow: '#4b5563',
+                    eye: '#ef4444',
+                    antenna: '#991b1b',
+                    chest: ['#ef4444', '#6b7280', '#374151']
+                }
+            }
+        ];
+        
+        let selectedCharacter = characters[0];
+        let isDarkMode = true;
+        
+        // ===== THEME TOGGLE =====
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('light-mode', !isDarkMode);
+            document.getElementById('themeIcon').textContent = isDarkMode ? '🌙' : '☀️';
+            document.getElementById('themeText').textContent = isDarkMode ? 'ダーク' : 'ライト';
+            localStorage.setItem('codequest-theme', isDarkMode ? 'dark' : 'light');
+            drawCanvas();
+        }
+        
+        // ===== CHARACTER SELECTOR =====
+        function initCharacterSelector() {
+            const grid = document.getElementById('characterGrid');
+            grid.innerHTML = '';
+            
+            characters.forEach((char, index) => {
+                const card = document.createElement('div');
+                card.className = 'character-card' + (char.id === selectedCharacter.id ? ' selected' : '');
+                card.innerHTML = `
+                    <div class="character-preview">
+                        <canvas id="charPreview${index}" width="60" height="60"></canvas>
+                    </div>
+                    <div class="character-name">${char.name}</div>
+                    <div class="character-desc">${char.desc}</div>
+                `;
+                card.addEventListener('click', () => selectCharacter(char, card));
+                grid.appendChild(card);
+                
+                // Draw preview
+                setTimeout(() => drawCharacterPreview(index, char), 10);
+            });
+        }
+        
+        function drawCharacterPreview(index, char) {
+            const canvas = document.getElementById('charPreview' + index);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, 60, 60);
+            drawRobotWithColors(ctx, 30, 35, char.colors, 0.8);
+        }
+        
+        function selectCharacter(char, card) {
+            selectedCharacter = char;
+            document.querySelectorAll('.character-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            localStorage.setItem('codequest-character', char.id);
+            drawCanvas();
+        }
+        
+        function loadSavedPreferences() {
+            // Load theme
+            const savedTheme = localStorage.getItem('codequest-theme');
+            if (savedTheme === 'light') {
+                isDarkMode = false;
+                document.body.classList.add('light-mode');
+                document.getElementById('themeIcon').textContent = '☀️';
+                document.getElementById('themeText').textContent = 'ライト';
+            }
+            
+            // Load character
+            const savedChar = localStorage.getItem('codequest-character');
+            if (savedChar) {
+                const found = characters.find(c => c.id === savedChar);
+                if (found) selectedCharacter = found;
+            }
+        }
+        
+        // ===== LEVEL DATA =====
+        const levels = [
+            // ===== WORLD 1: BASICS (1-20) =====
+            {
+                id: 1, world: 1,
+                title: "🚀 最初の一歩",
+                description: "ロボットを右に <strong>2マス</strong> 動かそう!<br><code>robot.move()</code> で1マス移動。",
+                initialCode: "// robot.move() を使おう!\n\n",
+                hint: "move() を2回書こう",
+                goalX: 2, goalY: 0,
+                obstacles: [], stars: [], gems: [],
+                validate: (r) => r.x === 2 && r.y === 0
+            },
+            {
+                id: 2, world: 1,
+                title: "🏃 3マス進め",
+                description: "右に <strong>3マス</strong> 移動しよう!",
+                initialCode: "// 3マス進もう!\n\n",
+                hint: "move() を3回",
+                goalX: 3, goalY: 0,
+                obstacles: [], stars: [], gems: [],
+                validate: (r) => r.x === 3 && r.y === 0
+            },
+            {
+                id: 3, world: 1,
+                title: "🎯 4マス進め",
+                description: "右に <strong>4マス</strong> 移動しよう!",
+                initialCode: "// 4マス進もう!\n\n",
+                hint: "move() を4回",
+                goalX: 4, goalY: 0,
+                obstacles: [], stars: [], gems: [],
+                validate: (r) => r.x === 4 && r.y === 0
+            },
+            {
+                id: 4, world: 1,
+                title: "⬆️ 上に移動",
+                description: "<code>robot.moveUp()</code> で上に移動!<br>右に1マス、上に1マス。",
+                initialCode: "// moveUp() を使おう!\n\n",
+                hint: "move() で右、moveUp() で上",
+                goalX: 1, goalY: -1,
+                obstacles: [], stars: [], gems: [],
+                validate: (r) => r.x === 1 && r.y === -1
+            },
+            {
+                id: 5, world: 1,
+                title: "⬇️ 下に移動",
+                description: "<code>robot.moveDown()</code> で下に移動!<br>右に1マス、下に1マス。",
+                initialCode: "// moveDown() を使おう!\n\n",
+                hint: "move() で右、moveDown() で下",
+                goalX: 1, goalY: 1,
+                obstacles: [], stars: [], gems: [],
+                validate: (r) => r.x === 1 && r.y === 1
+            },
+            {
+                id: 6, world: 1,
+                title: "↗️ 斜め移動",
+                description: "右に2マス、上に1マス進もう!",
+                initialCode: "// 右と上を組み合わせ!\n\n",
+                hint: "move()を2回、moveUp()を1回",
+                goalX: 2, goalY: -1,
+                obstacles: [], stars: [], gems: [],
+                validate: (r) => r.x === 2 && r.y === -1
+            },
+            {
+                id: 7, world: 1,
+                title: "↘️ 反対の斜め",
+                description: "右に2マス、下に1マス進もう!",
+                initialCode: "// 右と下を組み合わせ!\n\n",
+                hint: "move()を2回、moveDown()を1回",
+                goalX: 2, goalY: 1,
+                obstacles: [], stars: [], gems: [],
+                validate: (r) => r.x === 2 && r.y === 1
+            },
+            {
+                id: 8, world: 1,
+                title: "🔼 上に2マス",
+                description: "右に1マス、上に2マス進もう!",
+                initialCode: "// 上に2回移動!\n\n",
+                hint: "moveUp()を2回使おう",
+                goalX: 1, goalY: -2,
+                obstacles: [], stars: [], gems: [],
+                validate: (r) => r.x === 1 && r.y === -2
+            },
+            {
+                id: 9, world: 1,
+                title: "⭐ 星を集めよう",
+                description: "<code>robot.collect()</code> で星を収集!<br>位置1の星を集めてゴールへ。",
+                initialCode: "// collect() で星を集めよう!\n\n",
+                hint: "星の位置で collect() を呼ぼう",
+                goalX: 2, goalY: 0,
+                obstacles: [], stars: [1], gems: [],
+                validate: (r) => r.x === 2 && r.starsCollected >= 1
+            },
+            {
+                id: 10, world: 1,
+                title: "⭐⭐ 2つの星",
+                description: "2つの星を集めよう!<br>星は位置1と2にあります。",
+                initialCode: "// 2つ集めよう!\n\n",
+                hint: "移動して collect() を繰り返す",
+                goalX: 3, goalY: 0,
+                obstacles: [], stars: [1, 2], gems: [],
+                validate: (r) => r.x === 3 && r.starsCollected >= 2
+            },
+            {
+                id: 11, world: 1,
+                title: "🧱 障害物だ!",
+                description: "<code>robot.jump()</code> で障害物を飛び越えよう!",
+                initialCode: "// jump() でジャンプ!\n\n",
+                hint: "障害物の手前で jump()",
+                goalX: 2, goalY: 0,
+                obstacles: [{x: 1, y: 0}], stars: [], gems: [],
+                validate: (r) => r.x === 2 && !r.hitObstacle
+            },
+            {
+                id: 12, world: 1,
+                title: "🧱➡️ ジャンプと移動",
+                description: "ジャンプして、さらに1マス進もう!",
+                initialCode: "// ジャンプ後も移動!\n\n",
+                hint: "jump() の後に move()",
+                goalX: 3, goalY: 0,
+                obstacles: [{x: 1, y: 0}], stars: [], gems: [],
+                validate: (r) => r.x === 3 && !r.hitObstacle
+            },
+            {
+                id: 13, world: 1,
+                title: "💎 ジェムを集めろ",
+                description: "<code>robot.collectGem()</code> でジェム収集!",
+                initialCode: "// collectGem() を使おう!\n\n",
+                hint: "ジェムの位置で collectGem()",
+                goalX: 2, goalY: 0,
+                obstacles: [], stars: [], gems: [1],
+                validate: (r) => r.x === 2 && r.gemsCollected >= 1
+            },
+            {
+                id: 14, world: 1,
+                title: "⭐💎 星とジェム",
+                description: "星とジェムを両方集めよう!",
+                initialCode: "// 両方集めよう!\n\n",
+                hint: "collect() と collectGem() を使い分け",
+                goalX: 3, goalY: 0,
+                obstacles: [], stars: [1], gems: [2],
+                validate: (r) => r.x === 3 && r.starsCollected >= 1 && r.gemsCollected >= 1
+            },
+            {
+                id: 15, world: 1,
+                title: "🏔️ 上下の冒険",
+                description: "上に行って星を取り、下に戻ろう!",
+                initialCode: "// 上下移動で星を取ろう!\n\n",
+                hint: "moveUp() → collect() → moveDown()",
+                goalX: 1, goalY: 0,
+                obstacles: [], stars: [1], gems: [],
+                validate: (r) => r.x === 1 && r.y === 0 && r.starsCollected >= 1
+            },
+            {
+                id: 16, world: 1,
+                title: "🎯 精密操作",
+                description: "障害物を避けて星を集めよう!",
+                initialCode: "// ジャンプして星を取ろう!\n\n",
+                hint: "jump() で飛び越えた後に collect()",
+                goalX: 3, goalY: 0,
+                obstacles: [{x: 1, y: 0}], stars: [2], gems: [],
+                validate: (r) => r.x === 3 && r.starsCollected >= 1 && !r.hitObstacle
+            },
+            {
+                id: 17, world: 1,
+                title: "🌟 3つの星",
+                description: "3つの星を全部集めよう!",
+                initialCode: "// 3つ全部!\n\n",
+                hint: "位置1,2,3で collect()",
+                goalX: 4, goalY: 0,
+                obstacles: [], stars: [1, 2, 3], gems: [],
+                validate: (r) => r.x === 4 && r.starsCollected >= 3
+            },
+            {
+                id: 18, world: 1,
+                title: "🧱🧱 2つの障害物",
+                description: "2つの障害物を飛び越えよう!",
+                initialCode: "// 2回ジャンプ!\n\n",
+                hint: "jump() を2回使おう",
+                goalX: 4, goalY: 0,
+                obstacles: [{x: 1, y: 0}, {x: 3, y: 0}], stars: [], gems: [],
+                validate: (r) => r.x === 4 && !r.hitObstacle
+            },
+            {
+                id: 19, world: 1,
+                title: "💎💎 2つのジェム",
+                description: "2つのジェムを集めよう!",
+                initialCode: "// ジェム2つ!\n\n",
+                hint: "collectGem() を2回",
+                goalX: 3, goalY: 0,
+                obstacles: [], stars: [], gems: [1, 2],
+                validate: (r) => r.x === 3 && r.gemsCollected >= 2
+            },
+            {
+                id: 20, world: 1,
+                title: "🏆 基礎マスター",
+                description: "全スキルを使ってゴールへ!<br>障害物、星、ジェムに対応!",
+                initialCode: "// 基礎の集大成!\n\n",
+                hint: "jump, collect, collectGem を組み合わせ",
+                goalX: 5, goalY: 0,
+                obstacles: [{x: 2, y: 0}], stars: [1, 4], gems: [3],
+                validate: (r) => r.x === 5 && r.starsCollected >= 2 && r.gemsCollected >= 1 && !r.hitObstacle
+            },
+            
+            // ===== WORLD 2: LOOPS (21-40) =====
+            {
+                id: 21, world: 2,
+                title: "🔄 forループ入門",
+                description: "<code>for</code>ループで3マス移動!",
+                initialCode: "// for (let i = 0; i < 回数; i++) { }\n\n",
+                hint: "for の中に move() を入れよう",
+                goalX: 3, goalY: 0,
+                obstacles: [], stars: [], gems: [],
+                validate: (r) => r.x === 3 && r.y === 0
+            },
+            {
+                id: 22, world: 2,
+                title: "🔄 5マスループ",
+                description: "forループで5マス移動しよう!",
+                initialCode: "// 5回ループ!\n\n",
+                hint: "i < 5 でループ",
+                goalX: 5, goalY: 0,
+                obstacles: [], stars: [], gems: [],
+                validate: (r) => r.x === 5 && r.y === 0
+            },
+            {
+                id: 23, world: 2,
+                title: "🔁 whileループ",
+                description: "<code>while (robot.x < 4)</code> で移動!",
+                initialCode: "// while (条件) { }\n\n",
+                hint: "robot.x < 4 の間ループ",
+                goalX: 4, goalY: 0,
+                obstacles: [], stars: [], gems: [],
+                validate: (r) => r.x === 4 && r.y === 0
+            },
+            {
+                id: 24, world: 2,
+                title: "⭐ ループで星",
+                description: "ループで移動して星を集めよう!",
+                initialCode: "// ループで星集め!\n\n",
+                hint: "ループ内で move() と collect()",
+                goalX: 4, goalY: 0,
+                obstacles: [], stars: [1, 2, 3], gems: [],
+                validate: (r) => r.x === 4 && r.starsCollected >= 3
+            },
+            {
+                id: 25, world: 2,
+                title: "🔢 変数を使おう",
+                description: "<code>let steps = 3;</code> でループ回数を指定!",
+                initialCode: "let steps = 3;\n// steps を使ってループ!\n\n",
+                hint: "for の条件に steps を使う",
+                goalX: 3, goalY: 0,
+                obstacles: [], stars: [], gems: [],
+                validate: (r) => r.x === 3 && r.y === 0
+            },
+            {
+                id: 26, world: 2,
+                title: "🧱 ループでジャンプ",
+                description: "連続した障害物をループでジャンプ!",
+                initialCode: "// ループでジャンプ!\n\n",
+                hint: "for で jump() を繰り返す",
+                goalX: 3, goalY: 0,
+                obstacles: [{x: 1, y: 0}, {x: 2, y: 0}], stars: [], gems: [],
+                validate: (r) => r.x === 3 && !r.hitObstacle
+            },
+            {
+                id: 27, world: 2,
+                title: "💎 ループでジェム",
+                description: "ループでジェムを全部集めよう!",
+                initialCode: "// ジェムをループで!\n\n",
+                hint: "move() と collectGem() をループ",
+                goalX: 4, goalY: 0,
+                obstacles: [], stars: [], gems: [1, 2, 3],
+                validate: (r) => r.x === 4 && r.gemsCollected >= 3
+            },
+            {
+                id: 28, world: 2,
+                title: "⬆️ ループで上昇",
+                description: "ループで上に3マス移動!",
+                initialCode: "// ループで上へ!\n\n",
+                hint: "moveUp() をループ",
+                goalX: 1, goalY: -3,
+                obstacles: [], stars: [], gems: [],
+                validate: (r) => r.x === 1 && r.y === -3
+            },
+            {
+                id: 29, world: 2,
+                title: "🔀 2つのループ",
+                description: "右に3マス、上に2マス!<br>2つのループを使おう。",
+                initialCode: "// 2つのループ!\n\n",
+                hint: "最初のforで右、次のforで上",
+                goalX: 3, goalY: -2,
+                obstacles: [], stars: [], gems: [],
+                validate: (r) => r.x === 3 && r.y === -2
+            },
+            {
+                id: 30, world: 2,
+                title: "⭐💎 両方集め",
+                description: "ループで星とジェムを両方!",
+                initialCode: "// 両方集めよう!\n\n",
+                hint: "collect() と collectGem() を両方ループ内で",
+                goalX: 4, goalY: 0,
+                obstacles: [], stars: [1, 2, 3], gems: [1, 2, 3],
+                validate: (r) => r.x === 4 && r.starsCollected >= 3 && r.gemsCollected >= 3
+            },
+            {
+                id: 31, world: 2,
+                title: "🔄 6マスループ",
+                description: "forループで6マス移動!",
+                initialCode: "// 6回ループ!\n\n",
+                hint: "i < 6 でループ",
+                goalX: 6, goalY: 0,
+                obstacles: [], stars: [], gems: [],
+                validate: (r) => r.x === 6 && r.y === 0
+            },
+            {
+                id: 32, world: 2,
+                title: "🌀 whileで星集め",
+                description: "whileループで星を集めながら進もう!",
+                initialCode: "// whileで星集め!\n\n",
+                hint: "while (robot.x < 5) で星を集めながら",
+                goalX: 5, goalY: 0,
+                obstacles: [], stars: [1, 2, 3, 4], gems: [],
+                validate: (r) => r.x === 5 && r.starsCollected >= 4
+            },
+            {
+                id: 33, world: 2,
+                title: "🧱🧱🧱 3つの障害物",
+                description: "3つの連続障害物をループでジャンプ!",
+                initialCode: "// 3回ジャンプ!\n\n",
+                hint: "for で3回 jump()",
+                goalX: 4, goalY: 0,
+                obstacles: [{x: 1, y: 0}, {x: 2, y: 0}, {x: 3, y: 0}], stars: [], gems: [],
+                validate: (r) => r.x === 4 && !r.hitObstacle
+            },
+            {
+                id: 34, world: 2,
+                title: "⬇️ ループで下降",
+                description: "右に2マス、下に3マス!",
+                initialCode: "// 右と下のループ!\n\n",
+                hint: "2つのfor文を使おう",
+                goalX: 2, goalY: 3,
+                obstacles: [], stars: [], gems: [],
+                validate: (r) => r.x === 2 && r.y === 3
+            },
+            {
+                id: 35, world: 2,
+                title: "🔢 変数で星",
+                description: "変数 count で何個集めたか数えよう!",
+                initialCode: "let count = 0;\n// ループで数えながら集めよう!\n\n",
+                hint: "collect() の後に count++ で数える",
+                goalX: 4, goalY: 0,
+                obstacles: [], stars: [1, 2, 3], gems: [],
+                validate: (r) => r.x === 4 && r.starsCollected >= 3
+            },
+            {
+                id: 36, world: 2,
+                title: "🔁 while条件",
+                description: "星が3個になるまで進もう!",
+                initialCode: "// while (robot.starsCollected < 3)\n\n",
+                hint: "starsCollected をチェック",
+                goalX: 5, goalY: 0,
+                obstacles: [], stars: [1, 3, 5], gems: [],
+                validate: (r) => r.starsCollected >= 3
+            },
+            {
+                id: 37, world: 2,
+                title: "💎💎💎💎 4つのジェム",
+                description: "4つのジェムをループで!",
+                initialCode: "// 4つ集めよう!\n\n",
+                hint: "4回ループで collectGem()",
+                goalX: 5, goalY: 0,
+                obstacles: [], stars: [], gems: [1, 2, 3, 4],
+                validate: (r) => r.x === 5 && r.gemsCollected >= 4
+            },
+            {
+                id: 38, world: 2,
+                title: "📐 四角形パス",
+                description: "右に2マス、上に2マス進もう!",
+                initialCode: "// 四角形の角へ!\n\n",
+                hint: "2つのfor文で右と上",
+                goalX: 2, goalY: -2,
+                obstacles: [], stars: [], gems: [],
+                validate: (r) => r.x === 2 && r.y === -2
+            },
+            {
+                id: 39, world: 2,
+                title: "⭐ 5つの星",
+                description: "5つの星を全部集めよう!",
+                initialCode: "// 5つ全部!\n\n",
+                hint: "5回ループで move() と collect()",
+                goalX: 6, goalY: 0,
+                obstacles: [], stars: [1, 2, 3, 4, 5], gems: [],
+                validate: (r) => r.x === 6 && r.starsCollected >= 5
+            },
+            {
+                id: 40, world: 2,
+                title: "🏆 ループマスター",
+                description: "ループを駆使して全部集めよう!",
+                initialCode: "// ループの集大成!\n\n",
+                hint: "for文で障害物を避けながら星とジェムを",
+                goalX: 7, goalY: 0,
+                obstacles: [{x: 3, y: 0}], stars: [1, 2, 5, 6], gems: [4],
+                validate: (r) => r.x === 7 && r.starsCollected >= 4 && r.gemsCollected >= 1 && !r.hitObstacle
+            },
+            
+            // ===== WORLD 3: CONDITIONS (41-60) =====
+            {
+                id: 41, world: 3,
+                title: "❓ if文入門",
+                description: "<code>if (robot.isObstacle())</code> で障害物チェック!",
+                initialCode: "// if で障害物をチェック!\nfor (let i = 0; i < 3; i++) {\n  // ここにif文\n}\n",
+                hint: "isObstacle() が true なら jump()",
+                goalX: 3, goalY: 0,
+                obstacles: [{x: 1, y: 0}], stars: [], gems: [],
+                validate: (r) => r.x === 3 && !r.hitObstacle
+            },
+            {
+                id: 42, world: 3,
+                title: "🔀 if-else",
+                description: "障害物があれば jump、なければ move!",
+                initialCode: "// if-else を使おう!\nfor (let i = 0; i < 4; i++) {\n  \n}\n",
+                hint: "if (障害物) { jump } else { move }",
+                goalX: 4, goalY: 0,
+                obstacles: [{x: 2, y: 0}], stars: [], gems: [],
+                validate: (r) => r.x === 4 && !r.hitObstacle
+            },
+            {
+                id: 43, world: 3,
+                title: "⭐ 星チェック",
+                description: "<code>robot.isStar()</code> で星をチェック!",
+                initialCode: "// 星があるときだけ collect!\n\n",
+                hint: "if (robot.isStar()) { collect() }",
+                goalX: 4, goalY: 0,
+                obstacles: [], stars: [2, 4], gems: [],
+                validate: (r) => r.x === 4 && r.starsCollected >= 2
+            },
+            {
+                id: 44, world: 3,
+                title: "💎 ジェムチェック",
+                description: "<code>robot.isGem()</code> でジェムをチェック!",
+                initialCode: "// ジェムがあるときだけ collectGem!\n\n",
+                hint: "if (robot.isGem()) { collectGem() }",
+                goalX: 4, goalY: 0,
+                obstacles: [], stars: [], gems: [1, 3],
+                validate: (r) => r.x === 4 && r.gemsCollected >= 2
+            },
+            {
+                id: 45, world: 3,
+                title: "🔀 else if",
+                description: "複数の条件を else if で処理!",
+                initialCode: "// if, else if, else を使おう!\n\n",
+                hint: "障害物→星→移動 の順でチェック",
+                goalX: 5, goalY: 0,
+                obstacles: [{x: 2, y: 0}], stars: [1, 4], gems: [],
+                validate: (r) => r.x === 5 && r.starsCollected >= 2 && !r.hitObstacle
+            },
+            {
+                id: 46, world: 3,
+                title: "🎯 ゴールチェック",
+                description: "<code>robot.isGoal()</code> でゴールを検知!",
+                initialCode: "// ゴールまで進もう!\n\n",
+                hint: "while (!robot.isGoal()) でループ",
+                goalX: 5, goalY: 0,
+                obstacles: [], stars: [], gems: [],
+                validate: (r) => r.x === 5
+            },
+            {
+                id: 47, world: 3,
+                title: "🧠 AND演算子",
+                description: "<code>&&</code> で複数条件をチェック!",
+                initialCode: "// && は「かつ」\n\n",
+                hint: "条件A && 条件B で両方チェック",
+                goalX: 5, goalY: 0,
+                obstacles: [], stars: [1, 2, 3, 4], gems: [],
+                validate: (r) => r.x === 5 && r.starsCollected >= 4
+            },
+            {
+                id: 48, world: 3,
+                title: "🧠 OR演算子",
+                description: "<code>||</code> でどちらかの条件!",
+                initialCode: "// || は「または」\n\n",
+                hint: "星またはジェムがあれば収集",
+                goalX: 5, goalY: 0,
+                obstacles: [], stars: [1, 3], gems: [2, 4],
+                validate: (r) => r.x === 5 && r.starsCollected >= 2 && r.gemsCollected >= 2
+            },
+            {
+                id: 49, world: 3,
+                title: "🚫 NOT演算子",
+                description: "<code>!</code> で条件を反転!",
+                initialCode: "// ! は「でない」\n\n",
+                hint: "!robot.isObstacle() = 障害物がない",
+                goalX: 4, goalY: 0,
+                obstacles: [{x: 2, y: 0}], stars: [], gems: [],
+                validate: (r) => r.x === 4 && !r.hitObstacle
+            },
+            {
+                id: 50, world: 3,
+                title: "🔄 条件付きループ",
+                description: "条件を満たす間ループしよう!",
+                initialCode: "// while と if の組み合わせ!\n\n",
+                hint: "while でループ、中で if で分岐",
+                goalX: 6, goalY: 0,
+                obstacles: [{x: 2, y: 0}, {x: 4, y: 0}], stars: [], gems: [],
+                validate: (r) => r.x === 6 && !r.hitObstacle
+            },
+            {
+                id: 51, world: 3,
+                title: "⭐💎 両方チェック",
+                description: "星とジェム、それぞれの条件で収集!",
+                initialCode: "// 両方チェックしよう!\n\n",
+                hint: "if (isStar) と if (isGem) を別々に",
+                goalX: 5, goalY: 0,
+                obstacles: [], stars: [1, 3], gems: [2, 4],
+                validate: (r) => r.x === 5 && r.starsCollected >= 2 && r.gemsCollected >= 2
+            },
+            {
+                id: 52, world: 3,
+                title: "🧱⭐ 障害物と星",
+                description: "障害物を避けつつ星を集めよう!",
+                initialCode: "// 両方に対応!\n\n",
+                hint: "まず障害物チェック、次に星チェック",
+                goalX: 6, goalY: 0,
+                obstacles: [{x: 2, y: 0}], stars: [1, 4, 5], gems: [],
+                validate: (r) => r.x === 6 && r.starsCollected >= 3 && !r.hitObstacle
+            },
+            {
+                id: 53, world: 3,
+                title: "🔢 カウント条件",
+                description: "星を3個集めるまで進もう!",
+                initialCode: "// starsCollected で条件!\n\n",
+                hint: "while (robot.starsCollected < 3)",
+                goalX: 6, goalY: 0,
+                obstacles: [], stars: [1, 3, 5], gems: [],
+                validate: (r) => r.starsCollected >= 3
+            },
+            {
+                id: 54, world: 3,
+                title: "📍 位置条件",
+                description: "robot.x を使って条件分岐!",
+                initialCode: "// 位置で条件を変えよう!\n\n",
+                hint: "if (robot.x === 2) などで位置チェック",
+                goalX: 5, goalY: 0,
+                obstacles: [], stars: [2], gems: [4],
+                validate: (r) => r.x === 5 && r.starsCollected >= 1 && r.gemsCollected >= 1
+            },
+            {
+                id: 55, world: 3,
+                title: "🔀 複合条件",
+                description: "複数の条件を組み合わせよう!",
+                initialCode: "// && と || を組み合わせ!\n\n",
+                hint: "(条件A && 条件B) || 条件C",
+                goalX: 6, goalY: 0,
+                obstacles: [{x: 3, y: 0}], stars: [1, 2, 5], gems: [4],
+                validate: (r) => r.x === 6 && r.starsCollected >= 3 && r.gemsCollected >= 1 && !r.hitObstacle
+            },
+            {
+                id: 56, world: 3,
+                title: "🎯 ゴールまで収集",
+                description: "ゴールまで全部集めよう!",
+                initialCode: "// isGoal() まで収集!\n\n",
+                hint: "while (!isGoal()) で収集しながら",
+                goalX: 6, goalY: 0,
+                obstacles: [], stars: [1, 2, 3, 4, 5], gems: [],
+                validate: (r) => r.x === 6 && r.starsCollected >= 5
+            },
+            {
+                id: 57, world: 3,
+                title: "🧱🧱 2障害物条件",
+                description: "2つの障害物を条件で避けよう!",
+                initialCode: "// 条件で障害物対応!\n\n",
+                hint: "ループ内で isObstacle() チェック",
+                goalX: 5, goalY: 0,
+                obstacles: [{x: 1, y: 0}, {x: 3, y: 0}], stars: [], gems: [],
+                validate: (r) => r.x === 5 && !r.hitObstacle
+            },
+            {
+                id: 58, world: 3,
+                title: "⭐⭐⭐⭐ 4つの星",
+                description: "条件付きで4つの星を集めよう!",
+                initialCode: "// 4つ全部!\n\n",
+                hint: "if (isStar()) で星がある時だけ collect",
+                goalX: 6, goalY: 0,
+                obstacles: [], stars: [1, 2, 4, 5], gems: [],
+                validate: (r) => r.x === 6 && r.starsCollected >= 4
+            },
+            {
+                id: 59, world: 3,
+                title: "🌀 ネスト条件",
+                description: "if の中に if を入れよう!",
+                initialCode: "// ネストした条件!\n\n",
+                hint: "if (条件A) { if (条件B) { ... } }",
+                goalX: 5, goalY: 0,
+                obstacles: [{x: 2, y: 0}], stars: [3, 4], gems: [],
+                validate: (r) => r.x === 5 && r.starsCollected >= 2 && !r.hitObstacle
+            },
+            {
+                id: 60, world: 3,
+                title: "🏆 条件マスター",
+                description: "全ての条件技術を使おう!",
+                initialCode: "// 条件の集大成!\n\n",
+                hint: "while, if, else, &&, || を全部使おう",
+                goalX: 8, goalY: 0,
+                obstacles: [{x: 2, y: 0}, {x: 5, y: 0}], stars: [1, 3, 4, 6, 7], gems: [4],
+                validate: (r) => r.x === 8 && r.starsCollected >= 5 && r.gemsCollected >= 1 && !r.hitObstacle
+            },
+            
+            // ===== WORLD 4: FUNCTIONS (61-80) =====
+            {
+                id: 61, world: 4,
+                title: "⚙️ 関数入門",
+                description: "<code>function 名前() { }</code> で関数を作ろう!",
+                initialCode: "// 関数を作って呼び出そう!\nfunction moveOnce() {\n  robot.move();\n}\n\n// 3回呼び出してゴールへ\n",
+                hint: "関数を定義して、複数回呼び出す",
+                goalX: 3, goalY: 0,
+                obstacles: [], stars: [], gems: [],
+                validate: (r) => r.x === 3 && r.y === 0
+            },
+            {
+                id: 62, world: 4,
+                title: "⚙️ moveTwo関数",
+                description: "2マス移動する関数を作ろう!",
+                initialCode: "function moveTwo() {\n  // 2マス移動する関数\n}\n\n// 呼び出して4マス進もう\n",
+                hint: "関数内に move() を2回書く",
+                goalX: 4, goalY: 0,
+                obstacles: [], stars: [], gems: [],
+                validate: (r) => r.x === 4 && r.y === 0
+            },
+            {
+                id: 63, world: 4,
+                title: "📦 引数入門",
+                description: "<code>function move(n)</code> で引数を使おう!",
+                initialCode: "function moveN(n) {\n  // n回移動する関数\n}\n\n// moveN(4) で4マス進もう\n",
+                hint: "関数内で for ループと引数 n を使う",
+                goalX: 4, goalY: 0,
+                obstacles: [], stars: [], gems: [],
+                validate: (r) => r.x === 4 && r.y === 0
+            },
+            {
+                id: 64, world: 4,
+                title: "⭐ 収集関数",
+                description: "移動して収集する関数を作ろう!",
+                initialCode: "function moveAndCollect() {\n  // 移動して収集\n}\n\n// 3回呼び出そう\n",
+                hint: "関数内で move() と collect()",
+                goalX: 3, goalY: 0,
+                obstacles: [], stars: [1, 2, 3], gems: [],
+                validate: (r) => r.x === 3 && r.starsCollected >= 3
+            },
+            {
+                id: 65, world: 4,
+                title: "🧱 ジャンプ関数",
+                description: "障害物処理を関数にしよう!",
+                initialCode: "function handleMove() {\n  // 障害物があればジャンプ\n}\n\n// 4回呼び出そう\n",
+                hint: "if (isObstacle()) を関数内に",
+                goalX: 4, goalY: 0,
+                obstacles: [{x: 2, y: 0}], stars: [], gems: [],
+                validate: (r) => r.x === 4 && !r.hitObstacle
+            },
+            {
+                id: 66, world: 4,
+                title: "🔙 return入門",
+                description: "<code>return</code> で値を返そう!",
+                initialCode: "function getX() {\n  return robot.x;\n}\n\n// 関数を使って移動\nwhile (getX() < 4) {\n  robot.move();\n}\n",
+                hint: "return で現在位置を返す",
+                goalX: 4, goalY: 0,
+                obstacles: [], stars: [], gems: [],
+                validate: (r) => r.x === 4
+            },
+            {
+                id: 67, world: 4,
+                title: "🔢 カウント関数",
+                description: "収集した数を返す関数を作ろう!",
+                initialCode: "function collectAndCount() {\n  robot.move();\n  robot.collect();\n  return robot.starsCollected;\n}\n\n// 3回呼び出そう\n",
+                hint: "collect() 後に starsCollected を return",
+                goalX: 3, goalY: 0,
+                obstacles: [], stars: [1, 2, 3], gems: [],
+                validate: (r) => r.x === 3 && r.starsCollected >= 3
+            },
+            {
+                id: 68, world: 4,
+                title: "⚙️⚙️ 2つの関数",
+                description: "2つの関数を組み合わせよう!",
+                initialCode: "function goRight() {\n  robot.move();\n}\n\nfunction goUp() {\n  robot.moveUp();\n}\n\n// 組み合わせて使おう\n",
+                hint: "それぞれの関数を適切に呼び出す",
+                goalX: 2, goalY: -2,
+                obstacles: [], stars: [], gems: [],
+                validate: (r) => r.x === 2 && r.y === -2
+            },
+            {
+                id: 69, world: 4,
+                title: "📦 複数引数",
+                description: "引数を2つ使う関数を作ろう!",
+                initialCode: "function moveXY(x, y) {\n  // x回右、y回上に移動\n}\n\n// moveXY(3, 2) で移動\n",
+                hint: "for文を2つ使って x と y 回移動",
+                goalX: 3, goalY: -2,
+                obstacles: [], stars: [], gems: [],
+                validate: (r) => r.x === 3 && r.y === -2
+            },
+            {
+                id: 70, world: 4,
+                title: "🎯 条件付き関数",
+                description: "条件分岐を含む関数を作ろう!",
+                initialCode: "function smartMove() {\n  // 障害物チェックして移動\n}\n\n// ループで呼び出そう\n",
+                hint: "if (isObstacle()) を関数内に",
+                goalX: 5, goalY: 0,
+                obstacles: [{x: 2, y: 0}, {x: 4, y: 0}], stars: [], gems: [],
+                validate: (r) => r.x === 5 && !r.hitObstacle
+            },
+            {
+                id: 71, world: 4,
+                title: "⭐ 収集チェック関数",
+                description: "星があれば収集する関数を作ろう!",
+                initialCode: "function tryCollect() {\n  // 星があれば収集\n}\n\n// 移動しながら呼び出そう\n",
+                hint: "if (isStar()) { collect() } を関数に",
+                goalX: 5, goalY: 0,
+                obstacles: [], stars: [1, 3, 5], gems: [],
+                validate: (r) => r.x === 5 && r.starsCollected >= 3
+            },
+            {
+                id: 72, world: 4,
+                title: "💎 ジェム収集関数",
+                description: "ジェムチェック関数を作ろう!",
+                initialCode: "function tryCollectGem() {\n  // ジェムがあれば収集\n}\n\n",
+                hint: "if (isGem()) { collectGem() }",
+                goalX: 5, goalY: 0,
+                obstacles: [], stars: [], gems: [1, 2, 4],
+                validate: (r) => r.x === 5 && r.gemsCollected >= 3
+            },
+            {
+                id: 73, world: 4,
+                title: "🔀 分岐関数",
+                description: "複数の分岐を含む関数を作ろう!",
+                initialCode: "function step() {\n  // 障害物、星、ジェムをチェック\n}\n\n",
+                hint: "if-else if-else で全ケース対応",
+                goalX: 5, goalY: 0,
+                obstacles: [{x: 2, y: 0}], stars: [1, 4], gems: [3],
+                validate: (r) => r.x === 5 && r.starsCollected >= 2 && r.gemsCollected >= 1 && !r.hitObstacle
+            },
+            {
+                id: 74, world: 4,
+                title: "🔁 ループ関数",
+                description: "ループを含む関数を作ろう!",
+                initialCode: "function moveMany(n) {\n  // n回移動\n}\n\n// moveMany(5) で5マス\n",
+                hint: "for (let i = 0; i < n; i++) を関数内に",
+                goalX: 5, goalY: 0,
+                obstacles: [], stars: [], gems: [],
+                validate: (r) => r.x === 5 && r.y === 0
+            },
+            {
+                id: 75, world: 4,
+                title: "🔙 bool関数",
+                description: "true/false を返す関数を作ろう!",
+                initialCode: "function canCollect() {\n  return robot.isStar() || robot.isGem();\n}\n\n// canCollect() を使おう\n",
+                hint: "|| で星またはジェムをチェック",
+                goalX: 5, goalY: 0,
+                obstacles: [], stars: [1, 3], gems: [2, 4],
+                validate: (r) => r.x === 5 && r.starsCollected >= 2 && r.gemsCollected >= 2
+            },
+            {
+                id: 76, world: 4,
+                title: "⚙️⚙️⚙️ 3つの関数",
+                description: "3つの関数を連携させよう!",
+                initialCode: "function handleObstacle() { }\nfunction collectStar() { }\nfunction collectGem() { }\n\n// 組み合わせて使おう\n",
+                hint: "各関数に適切な処理を書く",
+                goalX: 6, goalY: 0,
+                obstacles: [{x: 2, y: 0}], stars: [1, 4, 5], gems: [3],
+                validate: (r) => r.x === 6 && r.starsCollected >= 3 && r.gemsCollected >= 1 && !r.hitObstacle
+            },
+            {
+                id: 77, world: 4,
+                title: "🎯 ゴール関数",
+                description: "ゴールまで進む関数を作ろう!",
+                initialCode: "function goToGoal() {\n  // isGoal() までループ\n}\n\ngoToGoal();\n",
+                hint: "while (!isGoal()) を関数内に",
+                goalX: 6, goalY: 0,
+                obstacles: [], stars: [], gems: [],
+                validate: (r) => r.x === 6
+            },
+            {
+                id: 78, world: 4,
+                title: "🌀 再帰的思考",
+                description: "関数から関数を呼び出そう!",
+                initialCode: "function step() {\n  // 1歩進む\n}\n\nfunction run() {\n  // step() を繰り返し呼ぶ\n}\n\nrun();\n",
+                hint: "run() 内で for ループで step() を呼ぶ",
+                goalX: 5, goalY: 0,
+                obstacles: [{x: 2, y: 0}], stars: [1, 3, 4], gems: [],
+                validate: (r) => r.x === 5 && r.starsCollected >= 3 && !r.hitObstacle
+            },
+            {
+                id: 79, world: 4,
+                title: "📊 統計関数",
+                description: "収集数の合計を返す関数!",
+                initialCode: "function getTotal() {\n  return robot.starsCollected + robot.gemsCollected;\n}\n\n// getTotal() を使おう\n",
+                hint: "星とジェムの合計を return",
+                goalX: 5, goalY: 0,
+                obstacles: [], stars: [1, 2, 3], gems: [4],
+                validate: (r) => r.x === 5 && r.starsCollected >= 3 && r.gemsCollected >= 1
+            },
+            {
+                id: 80, world: 4,
+                title: "🏆 マスターチャレンジ",
+                description: "全技術を使ってゴールへ!",
+                initialCode: "// 最終チャレンジ!\n// 関数、ループ、条件を全部使おう!\n\n",
+                hint: "smartMove, collectAll 関数を作り、whileでゴールまで",
+                goalX: 9, goalY: 0,
+                obstacles: [{x: 2, y: 0}, {x: 4, y: 0}, {x: 7, y: 0}], 
+                stars: [1, 3, 5, 6, 8], gems: [3, 6, 9],
+                validate: (r) => r.x === 9 && r.starsCollected >= 5 && r.gemsCollected >= 3 && !r.hitObstacle
+            }
+        ];
+
+        // ===== ROBOT CLASS =====
+        class Robot {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = 0;
+                this.y = 0;
+                this.starsCollected = 0;
+                this.gemsCollected = 0;
+                this.hitObstacle = false;
+                this.moves = [];
+                this.currentLevel = null;
+                this.eyeState = 'normal';
+                this.antennaGlow = 0;
+            }
+
+            setLevel(level) {
+                this.currentLevel = level;
+            }
+
+            move() {
+                const nextX = this.x + 1;
+                if (this.checkObstacleAt(nextX, this.y)) {
+                    this.hitObstacle = true;
+                    log('💥 障害物にぶつかった!');
+                    return;
+                }
+                this.moves.push({ type: 'move', fromX: this.x, fromY: this.y, toX: nextX, toY: this.y });
+                this.x = nextX;
+                log(`🤖 移動 → (${this.x}, ${this.y})`);
+            }
+
+            moveUp() {
+                const nextY = this.y - 1;
+                this.moves.push({ type: 'moveUp', fromX: this.x, fromY: this.y, toX: this.x, toY: nextY });
+                this.y = nextY;
+                log(`🤖 上へ移動 ↑ (${this.x}, ${this.y})`);
+            }
+
+            moveDown() {
+                const nextY = this.y + 1;
+                this.moves.push({ type: 'moveDown', fromX: this.x, fromY: this.y, toX: this.x, toY: nextY });
+                this.y = nextY;
+                log(`🤖 下へ移動 ↓ (${this.x}, ${this.y})`);
+            }
+
+            jump() {
+                const nextX = this.x + 1;
+                this.moves.push({ type: 'jump', fromX: this.x, fromY: this.y, toX: nextX, toY: this.y });
+                this.x = nextX;
+                log(`🤖 ジャンプ! → (${this.x}, ${this.y})`);
+            }
+
+            collect() {
+                if (this.isStar()) {
+                    this.starsCollected++;
+                    this.moves.push({ type: 'collectStar', x: this.x, y: this.y });
+                    log(`⭐ 星を収集! (${this.starsCollected}個)`);
+                }
+            }
+
+            collectGem() {
+                if (this.isGem()) {
+                    this.gemsCollected++;
+                    this.moves.push({ type: 'collectGem', x: this.x, y: this.y });
+                    log(`💎 ジェムを収集! (${this.gemsCollected}個)`);
+                }
+            }
+
+            checkObstacleAt(x, y) {
+                if (!this.currentLevel) return false;
+                return this.currentLevel.obstacles.some(o => o.x === x && o.y === y);
+            }
+
+            isObstacle() {
+                return this.checkObstacleAt(this.x + 1, this.y);
+            }
+
+            isStar() {
+                if (!this.currentLevel) return false;
+                return this.currentLevel.stars.includes(this.x);
+            }
+
+            isGem() {
+                if (!this.currentLevel) return false;
+                return this.currentLevel.gems.includes(this.x);
+            }
+
+            isGoal() {
+                if (!this.currentLevel) return false;
+                return this.x === this.currentLevel.goalX && this.y === this.currentLevel.goalY;
+            }
+        }
+
+        // ===== GAME STATE =====
+        const robot = new Robot();
+        let currentLevelIndex = 0;
+        let currentWorld = 1;
+        let completedLevels = new Set();
+        let levelStars = {};
+        let totalStarsEarned = 0;
+        let collectedStarsInLevel = new Set();
+        let collectedGemsInLevel = new Set();
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const output = document.getElementById('output');
+
+        // ===== STARFIELD BACKGROUND =====
+        function createStarfield() {
+            const starfield = document.getElementById('starfield');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = (Math.random() * 3 + 1) + 'px';
+                star.style.height = star.style.width;
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starfield.appendChild(star);
+            }
+        }
+        createStarfield();
+
+        // ===== LOGGING =====
+        function log(message) {
+            const p = document.createElement('p');
+            p.innerHTML = message;
+            output.appendChild(p);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function clearLog() {
+            output.innerHTML = '';
+        }
+
+        // ===== LEVEL MANAGEMENT =====
+        function getWorldLevels(world) {
+            return levels.filter(l => l.world === world);
+        }
+
+        function loadLevel(index) {
+            currentLevelIndex = index;
+            const level = levels[index];
+            currentWorld = level.world;
+            robot.setLevel(level);
+            robot.reset();
+            collectedStarsInLevel.clear();
+            collectedGemsInLevel.clear();
+            
+            document.getElementById('challengeTitle').innerHTML = 
+                `🎯 ${level.title}` + 
+                (level.concept ? `<span class="new-concept">${level.concept}</span>` : '');
+            document.getElementById('challengeDescription').innerHTML = level.description;
+            document.getElementById('codeInput').value = level.initialCode;
+            document.getElementById('hintBox').classList.remove('show');
+            clearLog();
+            drawCanvas();
+            
+            updateWorldButtons();
+            updateLevelButtons();
+            updateStats();
+            updateLineNumbers();
+            updateGameInfo();
+        }
+
+        function updateWorldButtons() {
+            document.querySelectorAll('.world-btn').forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.dataset.world) === currentWorld);
+            });
+        }
+
+        function updateLevelButtons() {
+            const selector = document.getElementById('levelSelector');
+            selector.innerHTML = '';
+            
+            const worldLevels = getWorldLevels(currentWorld);
+            
+            worldLevels.forEach((level) => {
+                const btn = document.createElement('button');
+                btn.className = 'level-btn';
+                
+                const globalIndex = levels.findIndex(l => l.id === level.id);
+                
+                if (globalIndex === currentLevelIndex) btn.classList.add('active');
+                if (completedLevels.has(level.id)) btn.classList.add('completed');
+                
+                btn.textContent = level.id;
+                
+                // Add stars
+                if (levelStars[level.id]) {
+                    const starsDiv = document.createElement('span');
+                    starsDiv.className = 'stars';
+                    starsDiv.textContent = '⭐'.repeat(levelStars[level.id]);
+                    btn.appendChild(starsDiv);
+                }
+                
+                btn.onclick = () => {
+                    loadLevel(globalIndex);
+                };
+                selector.appendChild(btn);
+            });
+        }
+
+        function updateStats() {
+            document.getElementById('completedCount').textContent = completedLevels.size;
+            document.getElementById('totalStars').textContent = totalStarsEarned;
+        }
+
+        function updateGameInfo() {
+            document.getElementById('robotPos').textContent = `(${robot.x}, ${robot.y})`;
+            document.getElementById('starsCollected').textContent = robot.starsCollected;
+            document.getElementById('gemsCollected').textContent = robot.gemsCollected;
+        }
+
+        function updateLineNumbers() {
+            const textarea = document.getElementById('codeInput');
+            const lines = textarea.value.split('\n').length;
+            const lineNumbers = document.getElementById('lineNumbers');
+            lineNumbers.innerHTML = Array.from({length: lines}, (_, i) => i + 1).join('<br>');
+        }
+
+        // ===== DRAWING =====
+        function drawCanvas() {
+            const level = levels[currentLevelIndex];
+            const cellSize = 50;
+            const startX = 40;
+            const startY = 200;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw grid background
+            drawGrid(startX, startY, cellSize);
+            
+            // Draw path
+            drawPath(startX, startY, cellSize, level.goalX);
+            
+            // Draw obstacles
+            drawObstacles(startX, startY, cellSize, level.obstacles);
+            
+            // Draw stars
+            drawStars(startX, startY, cellSize, level.stars);
+            
+            // Draw gems
+            drawGems(startX, startY, cellSize, level.gems);
+            
+            // Draw goal
+            drawGoal(startX + level.goalX * cellSize, startY, cellSize);
+            
+            // Draw robot
+            drawRobot(startX + robot.x * cellSize + cellSize / 2, startY - robot.y * cellSize - cellSize / 2 + 10, cellSize);
+        }
+
+        function drawGrid(startX, startY, cellSize) {
+            const isLightMode = document.body.classList.contains('light-mode');
+            ctx.strokeStyle = isLightMode ? 'rgba(71, 85, 105, 0.25)' : 'rgba(0, 245, 255, 0.1)';
+            ctx.lineWidth = 1;
+            
+            for (let i = 0; i <= 12; i++) {
+                ctx.beginPath();
+                ctx.moveTo(startX + i * cellSize, 50);
+                ctx.lineTo(startX + i * cellSize, 350);
+                ctx.stroke();
+            }
+            
+            for (let i = 0; i <= 6; i++) {
+                ctx.beginPath();
+                ctx.moveTo(startX, 50 + i * cellSize);
+                ctx.lineTo(startX + 12 * cellSize, 50 + i * cellSize);
+                ctx.stroke();
+            }
+        }
+
+        function drawPath(startX, startY, cellSize, goalX) {
+            const isLightMode = document.body.classList.contains('light-mode');
+            
+            let gradient;
+            if (isLightMode) {
+                gradient = ctx.createLinearGradient(startX, 0, startX + (goalX + 1) * cellSize, 0);
+                gradient.addColorStop(0, 'rgba(203, 213, 225, 0.9)');
+                gradient.addColorStop(1, 'rgba(16, 185, 129, 0.3)');
+            } else {
+                gradient = ctx.createLinearGradient(startX, 0, startX + (goalX + 1) * cellSize, 0);
+                gradient.addColorStop(0, 'rgba(30, 42, 69, 0.8)');
+                gradient.addColorStop(1, 'rgba(0, 255, 136, 0.2)');
+            }
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(startX, startY - cellSize + 10, (goalX + 1) * cellSize, cellSize);
+            
+            // Path border
+            ctx.strokeStyle = isLightMode ? 'rgba(71, 85, 105, 0.5)' : 'rgba(0, 245, 255, 0.3)';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(startX, startY - cellSize + 10, (goalX + 1) * cellSize, cellSize);
+        }
+
+        function drawObstacles(startX, startY, cellSize, obstacles) {
+            const isLightMode = document.body.classList.contains('light-mode');
+            
+            obstacles.forEach(obs => {
+                const x = startX + obs.x * cellSize;
+                const y = startY - obs.y * cellSize - cellSize + 10;
+                
+                // Obstacle body with gradient
+                const gradient = ctx.createLinearGradient(x, y, x, y + cellSize);
+                gradient.addColorStop(0, '#ff2d75');
+                gradient.addColorStop(1, '#c91a5a');
+                
+                ctx.fillStyle = gradient;
+                ctx.fillRect(x + 5, y + 10, cellSize - 10, cellSize - 10);
+                
+                // Danger stripes
+                ctx.strokeStyle = '#ffcc00';
+                ctx.lineWidth = 3;
+                for (let i = 0; i < 3; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(x + 10 + i * 12, y + 15);
+                    ctx.lineTo(x + 10 + i * 12, y + cellSize - 5);
+                    ctx.stroke();
+                }
+                
+                // Border
+                ctx.strokeStyle = isLightMode ? '#9f1239' : '#ff2d75';
+                ctx.lineWidth = isLightMode ? 3 : 2;
+                ctx.strokeRect(x + 5, y + 10, cellSize - 10, cellSize - 10);
+                
+                // Glow effect (only in dark mode)
+                if (!isLightMode) {
+                    ctx.shadowColor = '#ff2d75';
+                    ctx.shadowBlur = 15;
+                    ctx.strokeRect(x + 5, y + 10, cellSize - 10, cellSize - 10);
+                    ctx.shadowBlur = 0;
+                }
+            });
+        }
+
+        function drawStars(startX, startY, cellSize, stars) {
+            const isLightMode = document.body.classList.contains('light-mode');
+            
+            stars.forEach(starX => {
+                if (collectedStarsInLevel.has(starX)) return;
+                
+                const x = startX + starX * cellSize + cellSize / 2;
+                const y = startY - 60;
+                
+                // Glow (only in dark mode)
+                if (!isLightMode) {
+                    ctx.shadowColor = '#ffcc00';
+                    ctx.shadowBlur = 20;
+                }
+                
+                drawStarShape(ctx, x, y, 12, 5, '#ffcc00', '#ff9500');
+                
+                // Add outline in light mode
+                if (isLightMode) {
+                    ctx.strokeStyle = '#b45309';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+                
+                ctx.shadowBlur = 0;
+            });
+        }
+
+        function drawGems(startX, startY, cellSize, gems) {
+            const isLightMode = document.body.classList.contains('light-mode');
+            
+            gems.forEach(gemX => {
+                if (collectedGemsInLevel.has(gemX)) return;
+                
+                const x = startX + gemX * cellSize + cellSize / 2;
+                const y = startY - 75;
+                
+                // Glow (only in dark mode)
+                if (!isLightMode) {
+                    ctx.shadowColor = '#b14eff';
+                    ctx.shadowBlur = 15;
+                }
+                
+                ctx.fillStyle = '#b14eff';
+                ctx.beginPath();
+                ctx.moveTo(x, y - 10);
+                ctx.lineTo(x + 8, y);
+                ctx.lineTo(x, y + 10);
+                ctx.lineTo(x - 8, y);
+                ctx.closePath();
+                ctx.fill();
+                
+                // Add outline in light mode
+                if (isLightMode) {
+                    ctx.strokeStyle = '#7c3aed';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+                
+                // Shine
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+                ctx.beginPath();
+                ctx.moveTo(x - 2, y - 5);
+                ctx.lineTo(x + 3, y - 5);
+                ctx.lineTo(x, y);
+                ctx.closePath();
+                ctx.fill();
+                
+                ctx.shadowBlur = 0;
+            });
+        }
+
+        function drawStarShape(ctx, cx, cy, outerR, points, color1, color2) {
+            const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, outerR);
+            gradient.addColorStop(0, color1);
+            gradient.addColorStop(1, color2);
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            
+            for (let i = 0; i < points * 2; i++) {
+                const angle = (i * Math.PI) / points - Math.PI / 2;
+                const radius = i % 2 === 0 ? outerR : outerR / 2;
+                const x = cx + Math.cos(angle) * radius;
+                const y = cy + Math.sin(angle) * radius;
+                
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        function drawGoal(x, y, cellSize) {
+            const isLightMode = document.body.classList.contains('light-mode');
+            
+            // Goal platform
+            const gradient = ctx.createLinearGradient(x, y - cellSize, x, y + 10);
+            gradient.addColorStop(0, '#00ff88');
+            gradient.addColorStop(1, '#00cc6a');
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(x + 5, y - cellSize + 10, cellSize - 10, cellSize);
+            
+            // Border for visibility
+            ctx.strokeStyle = isLightMode ? '#047857' : '#00ff88';
+            ctx.lineWidth = isLightMode ? 3 : 2;
+            ctx.strokeRect(x + 5, y - cellSize + 10, cellSize - 10, cellSize);
+            
+            // Glow (only in dark mode)
+            if (!isLightMode) {
+                ctx.shadowColor = '#00ff88';
+                ctx.shadowBlur = 20;
+                ctx.strokeRect(x + 5, y - cellSize + 10, cellSize - 10, cellSize);
+                ctx.shadowBlur = 0;
+            }
+            
+            // Flag pole
+            ctx.fillStyle = isLightMode ? '#047857' : '#00ff88';
+            ctx.fillRect(x + cellSize / 2 - 2, y - cellSize - 20, 4, 40);
+            
+            // Flag
+            ctx.fillStyle = '#ff2d75';
+            ctx.beginPath();
+            ctx.moveTo(x + cellSize / 2 + 2, y - cellSize - 15);
+            ctx.lineTo(x + cellSize / 2 + 25, y - cellSize - 5);
+            ctx.lineTo(x + cellSize / 2 + 2, y - cellSize + 5);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Flag border in light mode
+            if (isLightMode) {
+                ctx.strokeStyle = '#9f1239';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+        }
+
+        function drawRobot(x, y, cellSize) {
+            drawRobotWithColors(ctx, x, y, selectedCharacter.colors, 1, cellSize);
+        }
+        
+        function drawRobotWithColors(ctx, x, y, colors, scale = 1, cellSize = 50) {
+            const size = cellSize * 0.7 * scale;
+            
+            // Shadow
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.beginPath();
+            ctx.ellipse(x, y + size / 2 + 5 * scale, size / 2, 8 * scale, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Body glow
+            ctx.shadowColor = colors.body;
+            ctx.shadowBlur = 20 * scale;
+            
+            // Body
+            const bodyGradient = ctx.createLinearGradient(x - size/2, y - size/2, x + size/2, y + size/2);
+            bodyGradient.addColorStop(0, colors.body);
+            bodyGradient.addColorStop(0.5, colors.bodyGlow);
+            bodyGradient.addColorStop(1, colors.bodyGlow);
+            
+            ctx.fillStyle = bodyGradient;
+            ctx.beginPath();
+            ctx.roundRect(x - size/2, y - size/2, size, size, 8 * scale);
+            ctx.fill();
+            
+            ctx.shadowBlur = 0;
+            
+            // Face plate
+            ctx.fillStyle = '#0a1520';
+            ctx.beginPath();
+            ctx.roundRect(x - size/2 + 5 * scale, y - size/2 + 5 * scale, size - 10 * scale, size/2, 5 * scale);
+            ctx.fill();
+            
+            // Eyes
+            const eyeY = y - size/4;
+            const eyeSpacing = size / 4;
+            
+            // Eye glow
+            ctx.shadowColor = colors.eye;
+            ctx.shadowBlur = 10 * scale;
+            
+            // Left eye
+            ctx.fillStyle = colors.eye;
+            ctx.beginPath();
+            ctx.arc(x - eyeSpacing, eyeY, 6 * scale, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Right eye
+            ctx.beginPath();
+            ctx.arc(x + eyeSpacing, eyeY, 6 * scale, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Eye highlights
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(x - eyeSpacing - 2 * scale, eyeY - 2 * scale, 2 * scale, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(x + eyeSpacing - 2 * scale, eyeY - 2 * scale, 2 * scale, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Mouth (smile)
+            ctx.strokeStyle = colors.eye;
+            ctx.lineWidth = 2 * scale;
+            ctx.beginPath();
+            ctx.arc(x, y + 2 * scale, 8 * scale, 0.1 * Math.PI, 0.9 * Math.PI);
+            ctx.stroke();
+            
+            // Antenna
+            ctx.strokeStyle = colors.body;
+            ctx.lineWidth = 3 * scale;
+            ctx.beginPath();
+            ctx.moveTo(x, y - size/2);
+            ctx.lineTo(x, y - size/2 - 15 * scale);
+            ctx.stroke();
+            
+            // Antenna ball with glow
+            ctx.shadowColor = colors.antenna;
+            ctx.shadowBlur = 15 * scale;
+            ctx.fillStyle = colors.antenna;
+            ctx.beginPath();
+            ctx.arc(x, y - size/2 - 18 * scale, 5 * scale, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            
+            // Chest panel
+            ctx.fillStyle = '#0a1520';
+            ctx.beginPath();
+            ctx.roundRect(x - 12 * scale, y + 5 * scale, 24 * scale, 12 * scale, 3 * scale);
+            ctx.fill();
+            
+            // Chest lights
+            const lightColors = colors.chest;
+            for (let i = 0; i < 3; i++) {
+                ctx.fillStyle = lightColors[i];
+                ctx.beginPath();
+                ctx.arc(x - 8 * scale + i * 8 * scale, y + 11 * scale, 3 * scale, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Arms
+            ctx.fillStyle = colors.bodyGlow;
+            ctx.fillRect(x - size/2 - 8 * scale, y - 5 * scale, 8 * scale, 20 * scale);
+            ctx.fillRect(x + size/2, y - 5 * scale, 8 * scale, 20 * scale);
+            
+            // Hands
+            ctx.fillStyle = colors.body;
+            ctx.beginPath();
+            ctx.arc(x - size/2 - 4 * scale, y + 18 * scale, 6 * scale, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(x + size/2 + 4 * scale, y + 18 * scale, 6 * scale, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // ===== ANIMATION =====
+        async function animateRobot() {
+            const cellSize = 50;
+            const startX = 40;
+            const startY = 200;
+            
+            for (const move of robot.moves) {
+                if (move.type === 'collectStar') {
+                    collectedStarsInLevel.add(move.x);
+                    createParticles(startX + move.x * cellSize + cellSize/2, startY - 60, '#ffcc00');
+                    drawCanvas();
+                    await sleep(200);
+                    continue;
+                }
+                
+                if (move.type === 'collectGem') {
+                    collectedGemsInLevel.add(move.x);
+                    createParticles(startX + move.x * cellSize + cellSize/2, startY - 75, '#b14eff');
+                    drawCanvas();
+                    await sleep(200);
+                    continue;
+                }
+                
+                const frames = 15;
+                for (let frame = 0; frame <= frames; frame++) {
+                    const progress = frame / frames;
+                    const easeProgress = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+                    
+                    let currentX = move.fromX + (move.toX - move.fromX) * easeProgress;
+                    let currentY = move.fromY + (move.toY - move.fromY) * easeProgress;
+                    let jumpOffset = 0;
+                    
+                    if (move.type === 'jump') {
+                        jumpOffset = Math.sin(progress * Math.PI) * 40;
+                    }
+                    
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    drawGrid(startX, startY, cellSize);
+                    drawPath(startX, startY, cellSize, levels[currentLevelIndex].goalX);
+                    drawObstacles(startX, startY, cellSize, levels[currentLevelIndex].obstacles);
+                    drawStars(startX, startY, cellSize, levels[currentLevelIndex].stars);
+                    drawGems(startX, startY, cellSize, levels[currentLevelIndex].gems);
+                    drawGoal(startX + levels[currentLevelIndex].goalX * cellSize, startY, cellSize);
+                    
+                    drawRobot(
+                        startX + currentX * cellSize + cellSize/2,
+                        startY - currentY * cellSize - cellSize/2 + 10 - jumpOffset,
+                        cellSize
+                    );
+                    
+                    await sleep(20);
+                }
+                
+                updateGameInfo();
+            }
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // ===== PARTICLE EFFECTS =====
+        function createParticles(x, y, color) {
+            for (let i = 0; i < 12; i++) {
+                const angle = (Math.PI * 2 / 12) * i;
+                const speed = 3 + Math.random() * 2;
+                const particle = {
+                    x, y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    life: 1,
+                    color
+                };
+                animateParticle(particle);
+            }
+        }
+
+        async function animateParticle(particle) {
+            while (particle.life > 0) {
+                particle.x += particle.vx;
+                particle.y += particle.vy;
+                particle.vy += 0.2;
+                particle.life -= 0.05;
+                
+                ctx.globalAlpha = particle.life;
+                ctx.fillStyle = particle.color;
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, 4 * particle.life, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+                
+                await sleep(16);
+            }
+        }
+
+        // ===== CELEBRATION =====
+        function showCelebration() {
+            const container = document.getElementById('celebrationContainer');
+            const colors = ['#ff2d75', '#00f5ff', '#ffcc00', '#00ff88', '#b14eff'];
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                container.appendChild(confetti);
+                
+                setTimeout(() => confetti.remove(), 3000);
+            }
+        }
+
+        function showLevelComplete(starsEarned) {
+            const modal = document.getElementById('levelCompleteModal');
+            const starsDisplay = document.getElementById('modalStars');
+            const message = document.getElementById('modalMessage');
+            
+            starsDisplay.textContent = '⭐'.repeat(starsEarned) + '☆'.repeat(3 - starsEarned);
+            
+            if (starsEarned === 3) {
+                message.textContent = '完璧! 素晴らしいコードだ!';
+            } else if (starsEarned === 2) {
+                message.textContent = 'いい感じ! もっと効率的に書けるかな?';
+            } else {
+                message.textContent = 'クリア! もう一度挑戦してみよう!';
+            }
+            
+            modal.classList.add('show');
+            showCelebration();
+        }
+
+        // ===== EVENT HANDLERS =====
+        document.getElementById('runBtn').addEventListener('click', async () => {
+            const code = document.getElementById('codeInput').value;
+            clearLog();
+            robot.reset();
+            collectedStarsInLevel.clear();
+            collectedGemsInLevel.clear();
+            drawCanvas();
+            
+            try {
+                log('🚀 コードを実行中...');
+                
+                // Execute user code
+                const wrappedCode = `
+                    (function() {
+                        ${code}
+                    })();
+                `;
+                eval(wrappedCode);
+                
+                await animateRobot();
+                
+                const level = levels[currentLevelIndex];
+                if (level.validate(robot)) {
+                    // Calculate stars
+                    const codeLength = code.replace(/\s+/g, '').length;
+                    let starsEarned = 1;
+                    if (codeLength < 200) starsEarned = 2;
+                    if (codeLength < 100) starsEarned = 3;
+                    
+                    // Update progress
+                    if (!completedLevels.has(level.id)) {
+                        completedLevels.add(level.id);
+                    }
+                    
+                    if (!levelStars[level.id] || levelStars[level.id] < starsEarned) {
+                        totalStarsEarned += starsEarned - (levelStars[level.id] || 0);
+                        levelStars[level.id] = starsEarned;
+                    }
+                    
+                    updateStats();
+                    updateLevelButtons();
+                    
+                    setTimeout(() => showLevelComplete(starsEarned), 500);
+                } else {
+                    updateStats();
+                    
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'error-message';
+                    errorDiv.textContent = '❌ ゴールに到達できませんでした。もう一度挑戦!';
+                    output.appendChild(errorDiv);
+                }
+            } catch (error) {
+                updateStats();
+                
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                errorDiv.textContent = '❌ エラー: ' + error.message;
+                output.appendChild(errorDiv);
+            }
+        });
+
+        document.getElementById('hintBtn').addEventListener('click', () => {
+            const hintBox = document.getElementById('hintBox');
+            const level = levels[currentLevelIndex];
+            hintBox.innerHTML = `<strong>💡 ヒント:</strong><code>${level.hint}</code>`;
+            hintBox.classList.toggle('show');
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            loadLevel(currentLevelIndex);
+        });
+
+        document.getElementById('nextLevelBtn').addEventListener('click', () => {
+            document.getElementById('levelCompleteModal').classList.remove('show');
+            if (currentLevelIndex < levels.length - 1) {
+                loadLevel(currentLevelIndex + 1);
+            }
+        });
+
+        document.querySelectorAll('.world-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentWorld = parseInt(btn.dataset.world);
+                const worldLevels = getWorldLevels(currentWorld);
+                const firstLevelIndex = levels.findIndex(l => l.id === worldLevels[0].id);
+                loadLevel(firstLevelIndex);
+            });
+        });
+
+        document.getElementById('codeInput').addEventListener('input', updateLineNumbers);
+        document.getElementById('codeInput').addEventListener('scroll', function() {
+            document.getElementById('lineNumbers').scrollTop = this.scrollTop;
+        });
+
+        // Initialize
+        loadSavedPreferences();
+        initCharacterSelector();
+        loadLevel(0);
+        
+        // Theme Toggle
+        document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+        
+        // Character Selector
+        const characterBtn = document.getElementById('characterBtn');
+        const characterModal = document.getElementById('characterModal');
+        const closeCharacterModal = document.getElementById('closeCharacterModal');
+        
+        characterBtn.addEventListener('click', () => {
+            initCharacterSelector();
+            characterModal.classList.add('show');
+        });
+        
+        closeCharacterModal.addEventListener('click', () => {
+            characterModal.classList.remove('show');
+        });
+        
+        characterModal.addEventListener('click', (e) => {
+            if (e.target === characterModal) {
+                characterModal.classList.remove('show');
+            }
+        });
+        
+        // Quick Reference Panel Toggle
+        const floatingHelpBtn = document.getElementById('floatingHelpBtn');
+        const quickRefPanel = document.getElementById('quickRefPanel');
+        const closeQuickRef = document.getElementById('closeQuickRef');
+        
+        floatingHelpBtn.addEventListener('click', () => {
+            quickRefPanel.classList.toggle('open');
+            floatingHelpBtn.classList.toggle('active');
+        });
+        
+        closeQuickRef.addEventListener('click', () => {
+            quickRefPanel.classList.remove('open');
+            floatingHelpBtn.classList.remove('active');
+        });
+    </script>
+</body>
+</html>
