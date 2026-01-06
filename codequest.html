@@ -3445,9 +3445,8 @@ async function initSupabase() {
                 showAuthError(error.message);
                 return false;
             }
-        }
+        } 
         
-        // 進捗をクラウドから同期
         async function syncProgressFromCloud() {
             if (!supabaseClient || !currentUser) return;
             
