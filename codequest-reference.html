@@ -500,12 +500,13 @@
         <header>
             <h1>📖 CodeQuest リファレンス</h1>
             <p class="subtitle">全80レベル - コマンド・構文・解答ガイド</p>
-            <a href="codequest.html" class="back-link">← ゲームに戻る</a>
+            <a href="index.html" class="back-link">← ゲームに戻る</a>
         </header>
         
         <nav class="nav-tabs">
             <button class="nav-tab active" data-section="commands">🤖 コマンド</button>
             <button class="nav-tab" data-section="jsguide">📚 JSガイド</button>
+            <button class="nav-tab" data-section="code-explanation">📖 コード説明</button>
             <button class="nav-tab" data-section="syntax">📝 構文</button>
             <button class="nav-tab" data-section="levels">🎮 全レベル</button>
             <button class="nav-tab" data-section="quickref">📋 早見表</button>
@@ -794,7 +795,10 @@ if (!robot.isGoal()) {
                     </tbody>
                 </table>
             </div>
-            
+        
+
+
+
             <!-- 条件分岐 -->
             <h3>🔀 条件分岐 (if文)</h3>
             <div class="concept-card">
@@ -1041,6 +1045,425 @@ for (let i = 0; i < 5; i++) {
                 </div>
             </div>
         </section>
+        
+<!-- 既存のコード説明セクションに追加 -->
+
+<section id="code-explanation" class="section">
+    <!-- 既存の内容... -->
+    
+    <h3>例8: ロボットクラスの内部実装</h3>
+    <div class="syntax-card">
+        <div class="syntax-title">robotオブジェクトの仕組み</div>
+        <div class="syntax-code">
+            <pre>// 実際のCodeQuestではこのようなクラスで実装されています
+class Robot {
+    constructor() {
+        // 初期位置
+        this.x = 0;
+        this.y = 0;
+        
+        // 収集アイテム
+        this.starsCollected = 0;
+        this.gemsCollected = 0;
+        
+        // ゲームボードの状態
+        this.board = [
+            ['R', '.', '.', '.', '⭐', '.', 'G'],
+            ['.', '#', '.', '⭐', '.', '.', '.'],
+            // ... 各レベルのマップデータ
+        ];
+    }
+    
+    // 移動メソッド
+    move() {
+        // 次の位置を計算
+        const nextX = this.x + 1;
+        const nextY = this.y;
+        
+        // 障害物チェック
+        if (this.isBlocked(nextX, nextY)) {
+            throw new Error("障害物にぶつかりました！");
+        }
+        
+        // 現在位置のアイテムをチェック
+        this.checkCurrentCell();
+        
+        // 位置を更新
+        this.x = nextX;
+        
+        // アニメーションを表示
+        this.showAnimation('move');
+    }
+    
+    moveUp() {
+        const nextX = this.x;
+        const nextY = this.y - 1; // 上はy座標が減る
+        
+        if (this.isBlocked(nextX, nextY)) {
+            throw new Error("障害物にぶつかりました！");
+        }
+        
+        this.checkCurrentCell();
+        this.y = nextY;
+        this.showAnimation('moveUp');
+    }
+    
+    moveDown() {
+        const nextX = this.x;
+        const nextY = this.y + 1; // 下はy座標が増える
+        
+        if (this.isBlocked(nextX, nextY)) {
+            throw new Error("障害物にぶつかりました！");
+        }
+        
+        this.checkCurrentCell();
+        this.y = nextY;
+        this.showAnimation('moveDown');
+    }
+    
+    jump() {
+        const nextX = this.x + 1;
+        const nextY = this.y;
+        
+        // ジャンプは障害物を無視
+        this.checkCurrentCell();
+        this.x = nextX;
+        this.showAnimation('jump');
+    }
+    
+    // 収集メソッド
+    collect() {
+        if (this.isStar()) {
+            this.starsCollected++;
+            this.removeItem('⭐');
+            this.showAnimation('collect');
+        }
+    }
+    
+    collectGem() {
+        if (this.isGem()) {
+            this.gemsCollected++;
+            this.removeItem('💎');
+            this.showAnimation('collectGem');
+        }
+    }
+    
+    // チェックメソッド
+    isObstacle() {
+        const nextX = this.x + 1;
+        const nextY = this.y;
+        return this.isBlocked(nextX, nextY);
+    }
+    
+    isStar() {
+        const cell = this.board[this.y][this.x];
+        return cell === '⭐';
+    }
+    
+    isGem() {
+        const cell = this.board[this.y][this.x];
+        return cell === '💎';
+    }
+    
+    isGoal() {
+        const cell = this.board[this.y][this.x];
+        return cell === 'G';
+    }
+    
+    // 内部処理メソッド
+    isBlocked(x, y) {
+        // ボードの範囲外チェック
+        if (y < 0 || y >= this.board.length) return true;
+        if (x < 0 || x >= this.board[y].length) return true;
+        
+        // 障害物チェック
+        const cell = this.board[y][x];
+        return cell === '#';
+    }
+    
+    checkCurrentCell() {
+        // 現在位置にアイテムがあれば自動収集（ゲームによっては手動）
+        if (this.isStar()) this.collect();
+        if (this.isGem()) this.collectGem();
+    }
+    
+    removeItem(itemType) {
+        // 収集したアイテムをボードから削除
+        this.board[this.y][this.x] = '.';
+    }
+    
+    showAnimation(type) {
+        // 画面にアニメーションを表示
+        console.log(`アニメーション: ${type}`);
+    }
+}</pre>
+        </div>
+        <div class="syntax-explanation">
+            <h4>📝 クラスの仕組み解説</h4>
+            
+            <p><strong>1. コンストラクタ (constructor)</strong></p>
+            <ul>
+                <li><code>this.x</code>, <code>this.y</code> - ロボットの現在位置を保存</li>
+                <li><code>this.starsCollected</code>, <code>this.gemsCollected</code> - 収集アイテムのカウンタ</li>
+                <li><code>this.board</code> - ゲームボードの状態を2次元配列で保持</li>
+            </ul>
+            
+            <p><strong>2. 移動メソッドの内部処理</strong></p>
+            <ul>
+                <li><code>move()</code>:
+                    <ol>
+                        <li>次の位置を計算 (<code>this.x + 1</code>)</li>
+                        <li>障害物チェック (<code>this.isBlocked()</code>)</li>
+                        <li>現在位置のアイテムをチェック</li>
+                        <li>位置を更新</li>
+                        <li>アニメーションを表示</li>
+                    </ol>
+                </li>
+                <li><code>moveUp()</code>: y座標を1減らす（画面では上がマイナス）</li>
+                <li><code>moveDown()</code>: y座標を1増やす</li>
+                <li><code>jump()</code>: 障害物チェックをスキップ</li>
+            </ul>
+            
+            <p><strong>3. 座標系の仕組み</strong></p>
+            <div class="syntax-code">
+                <pre>// ゲームボードの座標例
+ボード: [
+    [0,0, 0,1, 0,2, 0,3],  // 行0 (y=0)
+    [1,0, 1,1, 1,2, 1,3],  // 行1 (y=1)
+    [2,0, 2,1, 2,2, 2,3],  // 行2 (y=2)
+]
+
+// 上に移動: y - 1
+// 下に移動: y + 1
+// 右に移動: x + 1
+// 左に移動: x - 1</pre>
+            </div>
+            
+            <p><strong>4. 収集処理の流れ</strong></p>
+            <ol>
+                <li><code>isStar()</code> で星の有無を確認</li>
+                <li>あれば <code>starsCollected++</code> でカウント増加</li>
+                <li><code>removeItem()</code> でボードから削除</li>
+                <li>アニメーションを表示</li>
+            </ol>
+        </div>
+    </div>
+    
+    <!-- 実践的な例 -->
+    <h3>例9: 実際の呼び出しと内部動作</h3>
+    <div class="syntax-card">
+        <div class="syntax-title">コードの実行フロー</div>
+        <div class="syntax-code">
+            <pre>// ユーザーが書くコード
+robot.move();
+robot.collect();
+
+// 内部で起こること
+// 1. robot.move() の実行:
+//    - 現在位置: (0,0)
+//    - 次の位置: (1,0) を計算
+//    - 障害物がないかチェック
+//    - (0,0)にアイテムがあれば自動収集
+//    - 位置を(1,0)に更新
+//    - 移動アニメーションを表示
+
+// 2. robot.collect() の実行:
+//    - isStar()で(1,0)に星があるかチェック
+//    - あれば:
+//        * starsCollectedを1増やす
+//        * ボードから星を削除
+//        * 収集アニメーションを表示</pre>
+        </div>
+        <div class="syntax-explanation">
+            <h4>📝 内部状態の変化</h4>
+            
+            <table class="quick-ref-table">
+                <thead>
+                    <tr><th>実行前</th><th>コマンド</th><th>実行後</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>x=0, y=0<br>stars=0</td>
+                        <td><code>robot.move();</code></td>
+                        <td>x=1, y=0<br>stars=0</td>
+                    </tr>
+                    <tr>
+                        <td>x=1, y=0<br>stars=0<br>ボード[0][1]="⭐"</td>
+                        <td><code>robot.collect();</code></td>
+                        <td>x=1, y=0<br>stars=1<br>ボード[0][1]="."</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <p><strong>デバッグ表示の追加:</strong></p>
+            <div class="syntax-code">
+                <pre>// 内部状態を確認する改良版move()
+move() {
+    console.log(`移動前: (${this.x}, ${this.y})`);
+    
+    const nextX = this.x + 1;
+    const nextY = this.y;
+    
+    console.log(`移動先: (${nextX}, ${nextY})`);
+    console.log(`障害物？: ${this.isBlocked(nextX, nextY)}`);
+    
+    // 通常の処理...
+    
+    console.log(`移動後: (${this.x}, ${this.y})`);
+}</pre>
+            </div>
+        </div>
+    </div>
+    
+    <!-- オブジェクト指向の基本 -->
+    <h3>例10: オブジェクト指向の基本概念</h3>
+    <div class="syntax-card">
+        <div class="syntax-title">クラスとオブジェクト</div>
+        <div class="syntax-code">
+            <pre>// クラスの定義（設計図）
+class Robot {
+    constructor(name) {
+        this.name = name;
+        this.x = 0;
+        this.y = 0;
+    }
+    
+    move() {
+        this.x++;
+        console.log(`${this.name}が移動: (${this.x}, ${this.y})`);
+    }
+    
+    getPosition() {
+        return { x: this.x, y: this.y };
+    }
+}
+
+// オブジェクトの作成（実体）
+const robot1 = new Robot("ロボットA");
+const robot2 = new Robot("ロボットB");
+
+// メソッドの呼び出し
+robot1.move();  // "ロボットAが移動: (1, 0)"
+robot2.move();  // "ロボットBが移動: (1, 0)"
+
+// プロパティへのアクセス
+console.log(robot1.x);  // 1
+console.log(robot2.x);  // 1</pre>
+        </div>
+        <div class="syntax-explanation">
+            <h4>📝 オブジェクト指向のキーポイント</h4>
+            
+            <p><strong>1. クラス (Class)</strong></p>
+            <ul>
+                <li>オブジェクトの設計図</li>
+                <li>プロパティ（データ）とメソッド（機能）を定義</li>
+                <li><code>constructor()</code> で初期化</li>
+            </ul>
+            
+            <p><strong>2. オブジェクト (Object)</strong></p>
+            <ul>
+                <li>クラスから作られる実体</li>
+                <li><code>new ClassName()</code> で作成</li>
+                <li>それぞれ独立したデータを持つ</li>
+            </ul>
+            
+            <p><strong>3. CodeQuestのrobotオブジェクト</strong></p>
+            <ul>
+                <li>ゲーム開始時に自動的に作成される</li>
+                <li>プレイヤーは既存のオブジェクトを操作するだけ</li>
+                <li><code>robot.move()</code> は既存メソッドの呼び出し</li>
+            </ul>
+            
+            <div class="info-box tip">
+                <div class="info-box-title">💡 thisキーワード</div>
+                <p><code>this</code> は「このオブジェクト自身」を指します。</p>
+                <ul>
+                    <li><code>this.x</code> - このロボットのx座標</li>
+                    <li><code>this.move()</code> - このロボットのmoveメソッド</li>
+                    <li>各ロボットが自分自身のデータを持てる</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 演習問題 -->
+    <h3>演習: ロボットクラスを作ってみよう</h3>
+    <div class="concept-card">
+        <h4>簡易ロボットクラスの実装</h4>
+        
+        <div class="syntax-code">
+            <pre>// 演習問題: 以下の機能を持つRobotクラスを作成してください
+// 1. 初期位置を(0,0)にする
+// 2. moveRight()メソッドで右に移動
+// 3. moveLeft()メソッドで左に移動
+// 4. getPosition()で現在位置を返す
+
+// 解答例
+class Robot {
+    constructor() {
+        this.x = 0;
+        this.y = 0;
+    }
+    
+    moveRight() {
+        this.x++;
+        console.log(`右に移動: (${this.x}, ${this.y})`);
+    }
+    
+    moveLeft() {
+        this.x--;
+        console.log(`左に移動: (${this.x}, ${this.y})`);
+    }
+    
+    getPosition() {
+        return { x: this.x, y: this.y };
+    }
+}
+
+// テスト
+const myRobot = new Robot();
+myRobot.moveRight();  // (1, 0)
+myRobot.moveRight();  // (2, 0)
+myRobot.moveLeft();   // (1, 0)
+console.log(myRobot.getPosition());  // {x: 1, y: 0}</pre>
+        </div>
+        
+        <div class="syntax-explanation">
+            <h4>📝 理解度チェック</h4>
+            
+            <p><strong>問題1:</strong> 以下のコードを実行すると何が表示されますか？</p>
+            <div class="syntax-code">
+                <pre>class Counter {
+    constructor() {
+        this.count = 0;
+    }
+    
+    increment() {
+        this.count++;
+    }
+    
+    getValue() {
+        return this.count;
+    }
+}
+
+const c1 = new Counter();
+c1.increment();
+c1.increment();
+console.log(c1.getValue());</pre>
+            </div>
+            
+            <p><strong>問題2:</strong> 上下移動もできるRobotクラスを拡張してください。</p>
+            <p><strong>問題3:</strong> 移動回数を記録する<code>totalMoves</code>プロパティを追加してください。</p>
+            
+            <div class="info-box info">
+                <div class="info-box-title">💡 ヒント</div>
+                <p>実際のCodeQuestでは、robotオブジェクトはもっと多くの機能を持っていますが、基本は同じです。メソッドを呼ぶ → 内部状態が変わる → 結果が返る、という流れを理解しましょう。</p>
+            </div>
+        </div>
+    </div>
+</section>
+
         
         <!-- SYNTAX SECTION -->
         <section id="syntax" class="section">
