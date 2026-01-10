@@ -2679,7 +2679,7 @@
             position: fixed;
             width: 400px;
             height: 400px;
-            opacity: 0.3;
+            opacity: 0.45;
             z-index: 0;
             pointer-events: none;
             animation: floatLeftRight 8s ease-in-out infinite, floatUpDown 4s ease-in-out infinite;
@@ -2730,9 +2730,24 @@
         body.light-mode .floating-robot {
             opacity: 0.15;
         }
+        /* Rocket decoration */
+        .rocket-decoration {
+            position: fixed;
+            top: 15px;
+            left: -140px;
+            width: auto;
+            height: auto;
+            transform: scale(1.5) rotate(5deg);
+            z-index: -1;
+            pointer-events: none;
+            opacity: 0.85;
+        }
     </style>
 </head>
 <body>
+    <!-- Rocket decoration -->
+    <img src="rocket.png" class="rocket-decoration" alt="Rocket">
+
     <!-- Floating Robots Background -->
     <img src="robot_default.png" class="floating-robot floating-robot-1" id="floatingRobot1" alt="">
     <img src="robot_default.png" class="floating-robot floating-robot-2" id="floatingRobot2" alt="">
@@ -5416,18 +5431,18 @@ async function initSupabase() {
             gradient.addColorStop(1, '#00cc6a');
 
             ctx.fillStyle = gradient;
-            ctx.fillRect(x + 5 + xOffset, y - cellSize + 10 + yOffset, cellSize - 10, cellSize);
+            ctx.fillRect(x + 5 + xOffset, y - cellSize + 10 + yOffset, cellSize - 5, cellSize);
 
             // Border for visibility
             ctx.strokeStyle = isLightMode ? '#047857' : '#00ff88';
             ctx.lineWidth = isLightMode ? 3 : 2;
-            ctx.strokeRect(x + 5 + xOffset, y - cellSize + 10 + yOffset, cellSize - 10, cellSize);
+            ctx.strokeRect(x + 5 + xOffset, y - cellSize + 10 + yOffset, cellSize - 5, cellSize);
 
             // Glow (only in dark mode)
             if (!isLightMode) {
                 ctx.shadowColor = '#00ff88';
                 ctx.shadowBlur = 20;
-                ctx.strokeRect(x + 5 + xOffset, y - cellSize + 10 + yOffset, cellSize - 10, cellSize);
+                ctx.strokeRect(x + 5 + xOffset, y - cellSize + 10 + yOffset, cellSize - 5, cellSize);
                 ctx.shadowBlur = 0;
             }
 

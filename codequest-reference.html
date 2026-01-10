@@ -1711,7 +1711,28 @@ function getTotal() {
             77: { title: "🎯 ゴール関数", solution: "function goToGoal() {\n  while (!robot.isGoal()) {\n    robot.move();\n  }\n}\n\ngoToGoal();" },
             78: { title: "🌀 再帰的思考", solution: "function step() {\n  if (robot.isObstacle()) robot.jump();\n  else robot.move();\n  if (robot.isStar()) robot.collect();\n}\n\nfunction run() {\n  for (let i = 0; i < 5; i++) step();\n}\n\nrun();" },
             79: { title: "📊 統計関数", solution: "function getTotal() {\n  return robot.starsCollected + robot.gemsCollected;\n}\n\nfor (let i = 0; i < 5; i++) {\n  robot.move();\n  robot.collect();\n  robot.collectGem();\n}" },
-            80: { title: "🏆 マスターチャレンジ", solution: "function smartMove() {\n  if (robot.isObstacle()) robot.jump();\n  else robot.move();\n}\n\nfunction collectAll() {\n  if (robot.isStar()) robot.collect();\n  if (robot.isGem()) robot.collectGem();\n}\n\nwhile (!robot.isGoal()) {\n  smartMove();\n  collectAll();\n}" }
+            80: { title: "🏆 マスターチャレンジ", solution: "function smartMove() {\n  if (robot.isObstacle()) robot.jump();\n  else robot.move();\n}\n\nfunction collectAll() {\n  if (robot.isStar()) robot.collect();\n  if (robot.isGem()) robot.collectGem();\n}\n\nwhile (!robot.isGoal()) {\n  smartMove();\n  collectAll();\n}" },
+            // WORLD 5: デバッグ (81-100)
+            81: { title: "🐛 バグ修正1: タイプミス", solution: "robot.move();\nrobot.move();\nrobot.move();" },
+            82: { title: "🐛 バグ修正2: 回数不足", solution: "robot.move();\nrobot.move();\nrobot.move();\nrobot.move();\nrobot.move();" },
+            83: { title: "🐛 バグ修正3: 間違った関数", solution: "robot.move();\nrobot.move();\nrobot.moveUp();" },
+            84: { title: "🐛 バグ修正4: forループ", solution: "for (let i = 0; i < 6; i++) {\n  robot.move();\n}" },
+            85: { title: "🐛 バグ修正5: セミコロン忘れ", solution: "robot.move();\nrobot.move();\nrobot.move();\nrobot.move();" },
+            86: { title: "🐛 バグ修正6: 括弧忘れ", solution: "robot.move();\nrobot.move();\nrobot.move();" },
+            87: { title: "🐛 バグ修正7: 星を忘れた", solution: "robot.move();\nrobot.move();\nrobot.collect();\nrobot.move();\nrobot.move();" },
+            88: { title: "🐛 バグ修正8: while条件", solution: "while (robot.x < 5) {\n  robot.move();\n}" },
+            89: { title: "🐛 バグ修正9: 障害物衝突", solution: "robot.move();\nrobot.move();\nrobot.moveUp();\nrobot.move();\nrobot.moveDown();\nrobot.move();\nrobot.move();" },
+            90: { title: "🐛 バグ修正10: 順序間違い", solution: "robot.move();\nrobot.move();\nrobot.collect();\nrobot.move();" },
+            91: { title: "🐛 バグ修正11: 無限ループ", solution: "let count = 0;\nwhile (count < 4) {\n  robot.move();\n  count++;\n}" },
+            92: { title: "🐛 バグ修正12: if条件", solution: "for (let i = 0; i < 5; i++) {\n  robot.move();\n  if (robot.x === 3) {\n    robot.collect();\n  }\n}" },
+            93: { title: "🐛 バグ修正13: 変数名", solution: "for (let i = 0; i < 4; i++) {\n  robot.move();\n}\nrobot.move();\nrobot.move();" },
+            94: { title: "🐛 バグ修正14: 宝石忘れ", solution: "robot.move();\nrobot.move();\nrobot.collectGem();\nrobot.move();\nrobot.move();\nrobot.collectGem();\nrobot.move();" },
+            95: { title: "🐛 バグ修正15: 関数呼び出し", solution: "function move3() {\n  robot.move();\n  robot.move();\n  robot.move();\n}\n\nmove3();\nmove3();" },
+            96: { title: "🐛 バグ修正16: 中括弧", solution: "for (let i = 0; i < 4; i++) {\n  robot.move();\n  robot.collect();\n}" },
+            97: { title: "🐛 バグ修正17: Off-by-one", solution: "for (let i = 0; i < 5; i++) {\n  robot.move();\n}" },
+            98: { title: "🐛 バグ修正18: ロジックエラー", solution: "robot.move();\nrobot.move();\nrobot.moveUp();\nrobot.move();\nrobot.moveDown();\nrobot.move();" },
+            99: { title: "🐛 バグ修正19: 複合バグ", solution: "for (let i = 0; i < 4; i++) {\n  robot.move();\n}\nrobot.collect();" },
+            100: { title: "🐛 バグ修正20: 総合問題", solution: "robot.move();\nrobot.move();\nrobot.collect();\nrobot.move();\nrobot.move();\nif (robot.x === 4) {\n  robot.collectGem();\n}\nrobot.move();" }
         };
         
         // Generate levels HTML
@@ -1721,7 +1742,8 @@ function getTotal() {
                 { name: "🌍 ワールド1: 基礎", range: [1, 20], color: "#00f5ff" },
                 { name: "🔁 ワールド2: ループ", range: [21, 40], color: "#00ff88" },
                 { name: "🔀 ワールド3: 条件分岐", range: [41, 60], color: "#ffcc00" },
-                { name: "⚙️ ワールド4: 関数", range: [61, 80], color: "#b14eff" }
+                { name: "⚙️ ワールド4: 関数", range: [61, 80], color: "#b14eff" },
+                { name: "🐛 ワールド5: デバッグ", range: [81, 100], color: "#ff2d75" }
             ];
             
             worlds.forEach(world => {
