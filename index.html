@@ -8093,7 +8093,7 @@
             try {
                 const { error } = await supabaseClient.auth.updateUser({
                     email: newEmail
-                });
+                }); 
 
                 if (error) throw error;
 
