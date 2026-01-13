@@ -2249,6 +2249,13 @@
             color: white;
         }
 
+        /* Function mode completion - orange */
+        .level-btn.completed-func {
+            background: linear-gradient(135deg, #FF9500, #FF6B00);
+            border-color: #FF9500;
+            color: white;
+        }
+
         /* Both modes completion - green to purple gradient with prize */
         .level-btn.completed-both {
             background: linear-gradient(135deg, var(--accent-success), #00cc6a, #9966FF, #774DCB);
@@ -2465,6 +2472,15 @@
 
         .code-editor-wrapper.hidden {
             display: none;
+        }
+
+        /* Function Editor Styles */
+        .function-editor {
+            display: none;
+        }
+
+        .function-editor.active {
+            display: block;
         }
 
         .block-palette {
@@ -4163,6 +4179,7 @@
                         <div class="editor-mode-toggle">
                             <button class="mode-btn active" id="codeModeBtn">📝 コード</button>
                             <button class="mode-btn" id="blockModeBtn">🧩 ブロック</button>
+                            <button class="mode-btn" id="funcModeBtn">📜 フリー</button>
                         </div>
                     </div>
 
@@ -4202,6 +4219,14 @@
                         </div>
                         <div class="generated-code" id="generatedCode">
                             <pre id="generatedCodePre"></pre>
+                        </div>
+                    </div>
+
+                    <!-- Function Editor (Simple Code Editor) -->
+                    <div class="function-editor" id="functionEditor">
+                        <div class="code-editor">
+                            <div class="line-numbers" id="funcLineNumbers">1</div>
+                            <textarea id="funcCodeInput" spellcheck="false" placeholder="// 自由にJavaScriptを書こう!&#10;// 例:&#10;let x = 10;&#10;console.log(x * 2);&#10;&#10;function greet(name) {&#10;  return 'Hello, ' + name;&#10;}&#10;console.log(greet('World'));"></textarea>
                         </div>
                     </div>
                 </div>
@@ -6532,6 +6557,20 @@
 
         // ===== GAME STATE =====
         const robot = new Robot();
+
+        // ===== SIMPLE WRAPPER FUNCTIONS (for function editor mode) =====
+        // These allow students to write code without using robot. prefix
+        function move() { robot.move(); }
+        function moveUp() { robot.moveUp(); }
+        function moveDown() { robot.moveDown(); }
+        function jump() { robot.jump(); }
+        function collect() { robot.collect(); }
+        function collectGem() { robot.collectGem(); }
+        function isObstacle() { return robot.isObstacle(); }
+        function isStar() { return robot.isStar(); }
+        function isGem() { return robot.isGem(); }
+        function isGoal() { return robot.isGoal(); }
+
         let currentLevelIndex = 0;
         let currentWorld = 1;
         let completedLevels = new Set();
@@ -6717,7 +6756,7 @@
                 `🎯 ${level.title}` +
                 (level.concept ? `<span class="new-concept">${level.concept}</span>` : '');
             document.getElementById('challengeDescription').innerHTML = level.description;
-            document.getElementById('levelDisplay').textContent = level.id;
+            document.getElementById('levelDisplay').textContent = userLevel;
             document.getElementById('codeInput').value = level.initialCode;
             document.getElementById('hintBox').classList.remove('show');
             clearLog();
@@ -6726,6 +6765,14 @@
             // Clear block workspace when loading new level
             if (typeof clearBlockWorkspace === 'function') {
                 clearBlockWorkspace();
+            }
+
+            // Clear function editor when loading new level
+            const funcCodeInput = document.getElementById('funcCodeInput');
+            if (funcCodeInput) {
+                funcCodeInput.value = '';
+                const funcLineNumbers = document.getElementById('funcLineNumbers');
+                if (funcLineNumbers) funcLineNumbers.innerHTML = '1';
             }
 
             updateWorldButtons();
@@ -6762,6 +6809,8 @@
                         btn.classList.add('completed-both');
                     } else if (mode === 'block') {
                         btn.classList.add('completed-block');
+                    } else if (mode === 'func') {
+                        btn.classList.add('completed-func');
                     } else {
                         btn.classList.add('completed'); // code mode (green)
                     }
@@ -6787,6 +6836,7 @@
         function updateStats() {
             document.getElementById('completedCount').textContent = completedLevels.size;
             document.getElementById('totalStars').textContent = totalStarsEarned;
+            document.getElementById('levelDisplay').textContent = userLevel;
         }
 
         function updateGameInfo() {
@@ -7704,8 +7754,10 @@
             currentEditorMode = 'code';
             document.getElementById('codeModeBtn').classList.add('active');
             document.getElementById('blockModeBtn').classList.remove('active');
+            document.getElementById('funcModeBtn').classList.remove('active');
             document.getElementById('codeEditorWrapper').classList.remove('hidden');
             document.getElementById('blockEditor').classList.remove('active');
+            document.getElementById('functionEditor').classList.remove('active');
         }
 
         function switchToBlockMode() {
@@ -7714,10 +7766,24 @@
             currentEditorMode = 'block';
             document.getElementById('blockModeBtn').classList.add('active');
             document.getElementById('codeModeBtn').classList.remove('active');
+            document.getElementById('funcModeBtn').classList.remove('active');
             document.getElementById('codeEditorWrapper').classList.add('hidden');
             document.getElementById('blockEditor').classList.add('active');
+            document.getElementById('functionEditor').classList.remove('active');
             document.getElementById('generatedCode').classList.add('show');
             generateCodeFromBlocks();
+        }
+
+        function switchToFuncMode() {
+            playSound('select_stage_sound.mp3');
+
+            currentEditorMode = 'func';
+            document.getElementById('funcModeBtn').classList.add('active');
+            document.getElementById('codeModeBtn').classList.remove('active');
+            document.getElementById('blockModeBtn').classList.remove('active');
+            document.getElementById('codeEditorWrapper').classList.add('hidden');
+            document.getElementById('blockEditor').classList.remove('active');
+            document.getElementById('functionEditor').classList.add('active');
         }
 
         // Clear block workspace
@@ -7756,6 +7822,42 @@
         document.getElementById('runBtn').addEventListener('click', async () => {
             playSound('select_stage_sound.mp3');
 
+            // Function mode - standalone JS playground (no robot)
+            if (currentEditorMode === 'func') {
+                const code = document.getElementById('funcCodeInput').value;
+                clearLog();
+
+                try {
+                    log('🚀 コードを実行中...');
+
+                    // Create custom log function for user code
+                    const userLog = (...args) => {
+                        log('📝 ' + args.map(a =>
+                            typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a)
+                        ).join(' '));
+                    };
+
+                    // Execute user code with custom console
+                    const wrappedCode = `
+                        (function(console) {
+                            ${code}
+                        })({ log: userLog, warn: userLog, error: userLog });
+                    `;
+                    const result = eval(wrappedCode);
+
+                    // Show return value if any
+                    if (result !== undefined) {
+                        log('↩️ 戻り値: ' + (typeof result === 'object' ? JSON.stringify(result, null, 2) : result));
+                    }
+
+                    log('✅ 実行完了!');
+                } catch (error) {
+                    log('❌ エラー: ' + error.message);
+                }
+                return;
+            }
+
+            // Code/Block mode - robot simulator
             const code = document.getElementById('codeInput').value;
             clearLog();
             robot.reset();
@@ -7793,7 +7895,7 @@
                     }
 
                     // Track completion mode
-                    const currentMode = currentEditorMode; // 'code' or 'block'
+                    const currentMode = currentEditorMode; // 'code', 'block', or 'func'
                     const previousMode = levelCompletionMode[level.id];
 
                     if (!previousMode) {
@@ -7936,9 +8038,24 @@
         initBlockPalette();
         initBlockWorkspace();
 
-        // Block Mode Toggle
+        // Mode Toggle
         document.getElementById('codeModeBtn').addEventListener('click', switchToCodeMode);
         document.getElementById('blockModeBtn').addEventListener('click', switchToBlockMode);
+        document.getElementById('funcModeBtn').addEventListener('click', switchToFuncMode);
+
+        // Function Editor - line numbers
+        const funcCodeInput = document.getElementById('funcCodeInput');
+        funcCodeInput.addEventListener('input', updateFuncLineNumbers);
+        funcCodeInput.addEventListener('scroll', () => {
+            document.getElementById('funcLineNumbers').scrollTop = funcCodeInput.scrollTop;
+        });
+
+        function updateFuncLineNumbers() {
+            const textarea = document.getElementById('funcCodeInput');
+            const lines = textarea.value.split('\n').length;
+            const lineNumbers = document.getElementById('funcLineNumbers');
+            lineNumbers.innerHTML = Array.from({ length: lines }, (_, i) => i + 1).join('<br>');
+        }
 
         // Zoom Controls
         document.getElementById('zoomInBtn').addEventListener('click', zoomIn);
