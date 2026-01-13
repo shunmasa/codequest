@@ -613,6 +613,18 @@
             animation: fadeInDown 0.8s ease;
         }
 
+        .japan-clock {
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+            z-index: 100;
+            display: none;
+        }
+
         .logo-container {
             display: inline-block;
             position: relative;
@@ -1552,6 +1564,14 @@
 
         .text-color-preview.white-preview {
             color: #ffffff;
+        }
+
+        .text-color-preview.pink-preview {
+            color: #ff6b9d;
+        }
+
+        .text-color-preview.purple-preview {
+            color: #a78bfa;
         }
 
         .theme1-preview {
@@ -3176,14 +3196,117 @@
             animation: confettiFall 3s linear forwards;
         }
 
+        .confetti.circle {
+            border-radius: 50%;
+        }
+
+        .confetti.star {
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            width: 15px;
+            height: 15px;
+        }
+
+        .confetti.heart {
+            width: 12px;
+            height: 12px;
+            background: none !important;
+        }
+
+        .confetti.heart::before {
+            content: '❤️';
+            font-size: 12px;
+        }
+
         @keyframes confettiFall {
             0% {
-                transform: translateY(-100px) rotate(0deg);
+                transform: translateY(-100px) rotate(0deg) scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: translateY(50vh) rotate(360deg) scale(1.2);
                 opacity: 1;
             }
 
             100% {
-                transform: translateY(100vh) rotate(720deg);
+                transform: translateY(100vh) rotate(720deg) scale(0.8);
+                opacity: 0;
+            }
+        }
+
+        /* Sparkle effect */
+        .sparkle {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            animation: sparkleAnim 1s ease-out forwards;
+            pointer-events: none;
+        }
+
+        .sparkle::before {
+            content: '✨';
+            font-size: 20px;
+        }
+
+        @keyframes sparkleAnim {
+            0% {
+                transform: scale(0) rotate(0deg);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.5) rotate(180deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(0) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Ring wave */
+        .ring-wave {
+            position: absolute;
+            border: 3px solid;
+            border-radius: 50%;
+            animation: ringExpand 1.5s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes ringExpand {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 1;
+            }
+
+            100% {
+                width: 200px;
+                height: 200px;
+                margin-left: -100px;
+                margin-top: -100px;
+                opacity: 0;
+            }
+        }
+
+        /* Firework burst */
+        .firework {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: fireworkBurst 1s ease-out forwards;
+        }
+
+        @keyframes fireworkBurst {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(0);
                 opacity: 0;
             }
         }
@@ -3828,8 +3951,8 @@
         /* Floating Robot Background */
         .floating-robot {
             position: fixed;
-            width: 400px;
-            height: 400px;
+            width: 600px;
+            height: 600px;
             opacity: 0.45;
             z-index: 1;
             pointer-events: none;
@@ -3838,25 +3961,25 @@
         }
 
         .floating-robot-1 {
-            top: 3%;
-            right: calc(5% - 35px);
+            top: calc(3% - 60px);
+            right: calc(5% - 75px);
             animation-delay: 0s;
         }
 
         .floating-robot-2 {
-            top: 12%;
-            right: calc(20% - 85px);
-            width: 300px;
-            height: 300px;
+            top: calc(12% - 60px);
+            right: calc(20% - 45px);
+            width: 450px;
+            height: 450px;
             animation-delay: -2s;
             animation-duration: 10s, 5s;
         }
 
         .floating-robot-3 {
-            top: 25%;
-            right: calc(3% - 35px);
-            width: 250px;
-            height: 250px;
+            top: calc(25% - 60px);
+            right: calc(3% - 75px);
+            width: 375px;
+            height: 375px;
             animation-delay: -4s;
             animation-duration: 12s, 3s;
         }
@@ -3993,6 +4116,8 @@
                 <span id="syncText">同期中...</span>
             </div>
         </header>
+
+        <div class="japan-clock" id="japanClock">00:00:00</div>
 
         <div class="main-grid">
             <div class="panel">
@@ -4308,7 +4433,11 @@
                     <!-- Background Theme Selection -->
                     <div class="settings-label">🌌 背景テーマ</div>
                     <div class="theme-selector">
-                        <button class="theme-btn active" id="theme1Btn" data-theme="1">
+                        <button class="theme-btn active" id="theme5Btn" data-theme="5">
+                            <span class="theme-preview theme-futuristic-preview"></span>
+                            <span>フューチャー</span>
+                        </button>
+                        <button class="theme-btn" id="theme1Btn" data-theme="1">
                             <span class="theme-preview theme1-preview"></span>
                             <span>スター</span>
                         </button>
@@ -4323,10 +4452,6 @@
                         <button class="theme-btn" id="theme4Btn" data-theme="4">
                             <span class="theme-preview theme-realistic-preview"></span>
                             <span>コスモ</span>
-                        </button>
-                        <button class="theme-btn" id="theme5Btn" data-theme="5">
-                            <span class="theme-preview theme-futuristic-preview"></span>
-                            <span>フューチャー</span>
                         </button>
                         <button class="theme-btn" id="themeOffBtn" data-theme="off">
                             <span class="theme-preview themeoff-preview"></span>
@@ -4353,6 +4478,14 @@
                             <span class="text-color-preview white-preview">Aa</span>
                             <span>ホワイト</span>
                         </button>
+                        <button class="text-color-btn" data-textcolor="pink">
+                            <span class="text-color-preview pink-preview">Aa</span>
+                            <span>ピンク</span>
+                        </button>
+                        <button class="text-color-btn" data-textcolor="purple">
+                            <span class="text-color-preview purple-preview">Aa</span>
+                            <span>パープル</span>
+                        </button>
                     </div>
 
                     <div class="settings-toggle-row">
@@ -4373,6 +4506,13 @@
                         <span>🚀 ロケット表示</span>
                         <label class="toggle-switch">
                             <input type="checkbox" id="rocketToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="settings-toggle-row">
+                        <span>🕐 時計表示</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="clockToggle">
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
@@ -6400,9 +6540,10 @@
         }
 
         // Display settings
-        let bgTheme = localStorage.getItem('bgTheme') || '1';
+        let bgTheme = localStorage.getItem('bgTheme') || '5';
         let robotVisible = localStorage.getItem('robotVisible') !== 'false';
         let rocketVisible = localStorage.getItem('rocketVisible') !== 'false';
+        let clockVisible = localStorage.getItem('clockVisible') === 'true';
         let textColor = localStorage.getItem('textColor') || 'default';
 
         function applyDisplaySettings() {
@@ -6455,6 +6596,12 @@
                 rocket.style.display = rocketVisible ? 'block' : 'none';
             }
 
+            // Clock
+            const clock = document.getElementById('japanClock');
+            if (clock) {
+                clock.style.display = clockVisible ? 'block' : 'none';
+            }
+
             // Text color for code editor
             const codeTextarea = document.querySelector('.code-editor textarea');
             if (codeTextarea) {
@@ -6462,7 +6609,9 @@
                     'default': '#6ee7b7',
                     'blue': '#5cb8ff',
                     'yellow': '#fbbf24',
-                    'white': '#ffffff'
+                    'white': '#ffffff',
+                    'pink': '#ff6b9d',
+                    'purple': '#a78bfa'
                 };
                 codeTextarea.style.color = colorMap[textColor] || colorMap['default'];
             }
@@ -6495,6 +6644,20 @@
             }
         }
         createStarfield();
+
+        // ===== JAPAN TIME CLOCK =====
+        function updateJapanClock() {
+            const clockEl = document.getElementById('japanClock');
+            if (clockEl) {
+                const now = new Date();
+                const japanTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Tokyo' }));
+                const hours = String(japanTime.getHours()).padStart(2, '0');
+                const minutes = String(japanTime.getMinutes()).padStart(2, '0');
+                clockEl.textContent = `${hours}:${minutes}`;
+            }
+        }
+        updateJapanClock();
+        setInterval(updateJapanClock, 1000);
 
         // ===== LOGGING =====
         function log(message) {
@@ -6994,18 +7157,66 @@
         // ===== CELEBRATION =====
         function showCelebration() {
             const container = document.getElementById('celebrationContainer');
-            const colors = ['#ff2d75', '#00f5ff', '#ffcc00', '#00ff88', '#b14eff'];
+            const colors = ['#ff2d75', '#00f5ff', '#ffcc00', '#00ff88', '#b14eff', '#ff6b9d', '#a78bfa'];
+            const shapes = ['', 'circle', 'star', 'heart'];
 
-            for (let i = 0; i < 50; i++) {
+            // Enhanced confetti with different shapes
+            for (let i = 0; i < 80; i++) {
                 const confetti = document.createElement('div');
-                confetti.className = 'confetti';
+                const shape = shapes[Math.floor(Math.random() * shapes.length)];
+                confetti.className = 'confetti' + (shape ? ' ' + shape : '');
                 confetti.style.left = Math.random() * 100 + '%';
                 confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                confetti.style.animationDelay = Math.random() * 0.5 + 's';
-                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                confetti.style.animationDelay = Math.random() * 1 + 's';
+                confetti.style.animationDuration = (2 + Math.random() * 2) + 's';
                 container.appendChild(confetti);
+                setTimeout(() => confetti.remove(), 4000);
+            }
 
-                setTimeout(() => confetti.remove(), 3000);
+            // Sparkles around the screen
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const sparkle = document.createElement('div');
+                    sparkle.className = 'sparkle';
+                    sparkle.style.left = (20 + Math.random() * 60) + '%';
+                    sparkle.style.top = (20 + Math.random() * 60) + '%';
+                    container.appendChild(sparkle);
+                    setTimeout(() => sparkle.remove(), 1000);
+                }, Math.random() * 1500);
+            }
+
+            // Ring waves from center
+            for (let i = 0; i < 4; i++) {
+                setTimeout(() => {
+                    const ring = document.createElement('div');
+                    ring.className = 'ring-wave';
+                    ring.style.left = '50%';
+                    ring.style.top = '50%';
+                    ring.style.borderColor = colors[Math.floor(Math.random() * colors.length)];
+                    container.appendChild(ring);
+                    setTimeout(() => ring.remove(), 1500);
+                }, i * 300);
+            }
+
+            // Firework bursts
+            for (let burst = 0; burst < 3; burst++) {
+                setTimeout(() => {
+                    const cx = 20 + Math.random() * 60;
+                    const cy = 20 + Math.random() * 40;
+                    for (let i = 0; i < 12; i++) {
+                        const firework = document.createElement('div');
+                        firework.className = 'firework';
+                        firework.style.left = cx + '%';
+                        firework.style.top = cy + '%';
+                        firework.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                        const angle = (i / 12) * Math.PI * 2;
+                        const distance = 50 + Math.random() * 50;
+                        firework.style.setProperty('--tx', Math.cos(angle) * distance + 'px');
+                        firework.style.setProperty('--ty', Math.sin(angle) * distance + 'px');
+                        container.appendChild(firework);
+                        setTimeout(() => firework.remove(), 1000);
+                    }
+                }, burst * 500);
             }
         }
 
@@ -7967,6 +8178,7 @@
         const darkModeToggle = document.getElementById('darkModeToggle');
         const robotToggle = document.getElementById('robotToggle');
         const rocketToggle = document.getElementById('rocketToggle');
+        const clockToggle = document.getElementById('clockToggle');
 
         // Load dark mode setting
         darkModeToggle.checked = isDarkMode;
@@ -7976,6 +8188,7 @@
 
         robotToggle.checked = robotVisible;
         rocketToggle.checked = rocketVisible;
+        clockToggle.checked = clockVisible;
 
         darkModeToggle.addEventListener('change', () => {
             isDarkMode = darkModeToggle.checked;
@@ -7996,6 +8209,12 @@
         rocketToggle.addEventListener('change', () => {
             rocketVisible = rocketToggle.checked;
             localStorage.setItem('rocketVisible', rocketVisible);
+            applyDisplaySettings();
+        });
+
+        clockToggle.addEventListener('change', () => {
+            clockVisible = clockToggle.checked;
+            localStorage.setItem('clockVisible', clockVisible);
             applyDisplaySettings();
         });
 
