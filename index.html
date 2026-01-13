@@ -364,7 +364,7 @@
             pointer-events: none;
             z-index: 0;
             display: none;
-            background: linear-gradient(180deg, #000515 0%, #001030 40%, #002060 70%, #003080 100%);
+            background: linear-gradient(180deg, #0a0015 0%, #0d1025 40%, #0a1530 70%, #051020 100%);
             overflow: hidden;
         }
 
@@ -390,15 +390,23 @@
                 radial-gradient(2px 2px at 50% 5%, rgba(255,255,255,0.95), transparent);
         }
 
-        /* Center horizon glow */
+        /* Center horizon glow - green aurora */
         .aurora-curtain {
             position: absolute;
             bottom: 35%;
-            left: 30%;
-            width: 40%;
-            height: 150px;
-            background: radial-gradient(ellipse at center bottom, rgba(0, 180, 255, 0.6) 0%, rgba(0, 150, 255, 0.3) 30%, transparent 70%);
+            left: 20%;
+            width: 60%;
+            height: 200px;
+            background:
+                radial-gradient(ellipse at 30% bottom, rgba(0, 220, 130, 0.6) 0%, rgba(0, 180, 100, 0.3) 40%, transparent 70%),
+                radial-gradient(ellipse at 70% bottom, rgba(160, 100, 255, 0.5) 0%, rgba(140, 80, 220, 0.25) 40%, transparent 70%);
             filter: blur(30px);
+            animation: auroraPulse 8s ease-in-out infinite;
+        }
+
+        @keyframes auroraPulse {
+            0%, 100% { opacity: 0.8; transform: scaleY(1); }
+            50% { opacity: 1; transform: scaleY(1.1); }
         }
 
         /* Grid floor */
@@ -409,8 +417,8 @@
             width: 300%;
             height: 40%;
             background:
-                linear-gradient(90deg, transparent 0%, rgba(0, 200, 255, 0.5) 1px, transparent 1px),
-                linear-gradient(0deg, transparent 0%, rgba(0, 200, 255, 0.35) 1px, transparent 1px);
+                linear-gradient(90deg, transparent 0%, rgba(0, 200, 130, 0.5) 1px, transparent 1px),
+                linear-gradient(0deg, transparent 0%, rgba(140, 80, 220, 0.35) 1px, transparent 1px);
             background-size: 80px 40px;
             transform: perspective(350px) rotateX(75deg);
             transform-origin: center top;
@@ -431,7 +439,7 @@
             height: 55%;
             background:
                 linear-gradient(90deg,
-                    rgba(0, 150, 255, 0.15) 0%,
+                    rgba(0, 180, 100, 0.15) 0%,
                     transparent 100%
                 );
         }
@@ -445,13 +453,13 @@
             height: 100%;
             background:
                 /* Building outlines - left side */
-                linear-gradient(to right, rgba(0, 200, 255, 0.4) 1px, transparent 1px) 5% 0 / 15% 80% no-repeat,
-                linear-gradient(to bottom, rgba(0, 200, 255, 0.4) 1px, transparent 1px) 5% 20% / 15% 1px no-repeat,
-                linear-gradient(to right, rgba(0, 200, 255, 0.3) 1px, transparent 1px) 20% 0 / 12% 90% no-repeat,
-                linear-gradient(to right, rgba(0, 200, 255, 0.5) 1px, transparent 1px) 8% 0 / 20% 70% no-repeat,
-                linear-gradient(to right, rgba(0, 200, 255, 0.35) 1px, transparent 1px) 25% 0 / 18% 95% no-repeat,
-                linear-gradient(to bottom, rgba(0, 200, 255, 0.3) 1px, transparent 1px) 8% 30% / 20% 1px no-repeat,
-                linear-gradient(to right, rgba(0, 180, 255, 0.25) 1px, transparent 1px) 35% 0 / 10% 60% no-repeat;
+                linear-gradient(to right, rgba(0, 220, 130, 0.4) 1px, transparent 1px) 5% 0 / 15% 80% no-repeat,
+                linear-gradient(to bottom, rgba(0, 220, 130, 0.4) 1px, transparent 1px) 5% 20% / 15% 1px no-repeat,
+                linear-gradient(to right, rgba(0, 200, 120, 0.3) 1px, transparent 1px) 20% 0 / 12% 90% no-repeat,
+                linear-gradient(to right, rgba(0, 220, 130, 0.5) 1px, transparent 1px) 8% 0 / 20% 70% no-repeat,
+                linear-gradient(to right, rgba(0, 200, 120, 0.35) 1px, transparent 1px) 25% 0 / 18% 95% no-repeat,
+                linear-gradient(to bottom, rgba(0, 200, 120, 0.3) 1px, transparent 1px) 8% 30% / 20% 1px no-repeat,
+                linear-gradient(to right, rgba(0, 180, 100, 0.25) 1px, transparent 1px) 35% 0 / 10% 60% no-repeat;
         }
 
         /* Right buildings */
@@ -463,7 +471,7 @@
             height: 55%;
             background:
                 linear-gradient(270deg,
-                    rgba(0, 150, 255, 0.15) 0%,
+                    rgba(140, 80, 220, 0.15) 0%,
                     transparent 100%
                 );
         }
@@ -477,12 +485,12 @@
             height: 100%;
             background:
                 /* Building outlines - right side */
-                linear-gradient(to left, rgba(0, 200, 255, 0.4) 1px, transparent 1px) 95% 0 / 15% 85% no-repeat,
-                linear-gradient(to left, rgba(0, 200, 255, 0.3) 1px, transparent 1px) 80% 0 / 12% 75% no-repeat,
-                linear-gradient(to left, rgba(0, 200, 255, 0.5) 1px, transparent 1px) 88% 0 / 18% 90% no-repeat,
-                linear-gradient(to bottom, rgba(0, 200, 255, 0.3) 1px, transparent 1px) 88% 10% / 18% 1px no-repeat,
-                linear-gradient(to left, rgba(0, 200, 255, 0.35) 1px, transparent 1px) 72% 0 / 14% 65% no-repeat,
-                linear-gradient(to left, rgba(0, 180, 255, 0.25) 1px, transparent 1px) 65% 0 / 10% 55% no-repeat;
+                linear-gradient(to left, rgba(160, 100, 255, 0.4) 1px, transparent 1px) 95% 0 / 15% 85% no-repeat,
+                linear-gradient(to left, rgba(140, 80, 220, 0.3) 1px, transparent 1px) 80% 0 / 12% 75% no-repeat,
+                linear-gradient(to left, rgba(160, 100, 255, 0.5) 1px, transparent 1px) 88% 0 / 18% 90% no-repeat,
+                linear-gradient(to bottom, rgba(140, 80, 220, 0.3) 1px, transparent 1px) 88% 10% / 18% 1px no-repeat,
+                linear-gradient(to left, rgba(160, 100, 255, 0.35) 1px, transparent 1px) 72% 0 / 14% 65% no-repeat,
+                linear-gradient(to left, rgba(140, 80, 220, 0.25) 1px, transparent 1px) 65% 0 / 10% 55% no-repeat;
         }
 
         /* Additional glow effects */
@@ -493,11 +501,13 @@
             width: 100%;
             height: 5px;
             background: linear-gradient(90deg,
-                rgba(0, 200, 255, 0.3) 0%,
-                rgba(0, 220, 255, 0.8) 50%,
-                rgba(0, 200, 255, 0.3) 100%);
+                rgba(0, 200, 130, 0.3) 0%,
+                rgba(0, 220, 150, 0.8) 30%,
+                rgba(100, 180, 200, 0.6) 50%,
+                rgba(160, 100, 255, 0.8) 70%,
+                rgba(140, 80, 220, 0.3) 100%);
             filter: blur(3px);
-            box-shadow: 0 0 30px rgba(0, 200, 255, 0.5), 0 0 60px rgba(0, 200, 255, 0.3);
+            box-shadow: 0 0 30px rgba(0, 200, 130, 0.5), 0 0 60px rgba(140, 80, 220, 0.3);
         }
 
         /* Futuristic Theme - Synthwave */
@@ -618,11 +628,14 @@
             top: 15px;
             right: 20px;
             font-family: 'Nunito', sans-serif;
-            font-size: 1.6rem;
+            font-size: 1.9rem;
             font-weight: 600;
             color: var(--accent-primary);
             z-index: 100;
             display: none;
+            padding: 0.4rem 0.8rem;
+            border: 2px dotted var(--aurora-green);
+            border-radius: 8px;
         }
 
         .logo-container {
@@ -6602,19 +6615,31 @@
                 clock.style.display = clockVisible ? 'block' : 'none';
             }
 
-            // Text color for code editor
+            // Text color settings
+            const colorMap = {
+                'default': '#6ee7b7',
+                'blue': '#5cb8ff',
+                'yellow': '#fbbf24',
+                'white': '#ffffff',
+                'pink': '#ff6b9d',
+                'purple': '#a78bfa'
+            };
+
+            // Apply to code editor
             const codeTextarea = document.querySelector('.code-editor textarea');
             if (codeTextarea) {
-                const colorMap = {
-                    'default': '#6ee7b7',
-                    'blue': '#5cb8ff',
-                    'yellow': '#fbbf24',
-                    'white': '#ffffff',
-                    'pink': '#ff6b9d',
-                    'purple': '#a78bfa'
-                };
                 codeTextarea.style.color = colorMap[textColor] || colorMap['default'];
             }
+
+            // Apply to code elements in quick reference
+            document.querySelectorAll('.quick-ref-content code').forEach(code => {
+                code.style.color = colorMap[textColor] || colorMap['default'];
+            });
+
+            // Apply to code elements in hint box
+            document.querySelectorAll('.hint-box code').forEach(code => {
+                code.style.color = colorMap[textColor] || colorMap['default'];
+            });
 
             // Update text color buttons
             document.querySelectorAll('.text-color-btn').forEach(btn => {
@@ -7263,10 +7288,10 @@
                 { id: 'collectGem', icon: '💎', label: 'ジェム収集', code: 'robot.collectGem();', category: 'collect' }
             ],
             check: [
-                { id: 'isObstacle', icon: '🧱', label: '障害物？', code: 'robot.isObstacle()', isCondition: true, category: 'check' },
-                { id: 'isStar', icon: '⭐', label: '星がある？', code: 'robot.isStar()', isCondition: true, category: 'check' },
-                { id: 'isGem', icon: '💎', label: 'ジェム？', code: 'robot.isGem()', isCondition: true, category: 'check' },
-                { id: 'isGoal', icon: '🏁', label: 'ゴール？', code: 'robot.isGoal()', isCondition: true, category: 'check' }
+                { id: 'isObstacle', icon: '🧱', label: '障害物？', code: 'robot.isObstacle()', category: 'check' },
+                { id: 'isStar', icon: '⭐', label: '星がある？', code: 'robot.isStar()', category: 'check' },
+                { id: 'isGem', icon: '💎', label: 'ジェム？', code: 'robot.isGem()', category: 'check' },
+                { id: 'isGoal', icon: '🏁', label: 'ゴール？', code: 'robot.isGoal()', category: 'check' }
             ],
             control: [
                 { id: 'if', icon: '🔀', label: 'もし', code: 'if', isContainer: true, hasCondition: true, category: 'control' },
