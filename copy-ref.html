@@ -1,0 +1,1813 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeQuest - リファレンスガイド</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@600;700&family=Orbitron:wght@400;700&display=swap');
+        
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #141b2d;
+            --bg-tertiary: #1e2a45;
+            --bg-card: #182035;
+            --accent-primary: #00f5ff;
+            --accent-secondary: #ff2d75;
+            --accent-tertiary: #b14eff;
+            --accent-success: #00ff88;
+            --accent-warning: #ffcc00;
+            --text-primary: #e8f4f8;
+            --text-secondary: #8892b0;
+            --text-code: #7dd3fc;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Space Mono', monospace;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .starfield {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-tertiary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle { color: var(--text-secondary); font-size: 1rem; }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.5rem 1.5rem;
+            background: var(--bg-tertiary);
+            color: var(--accent-primary);
+            text-decoration: none;
+            border-radius: 8px;
+            border: 1px solid var(--accent-primary);
+            transition: all 0.3s ease;
+        }
+        
+        .back-link:hover {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .nav-tab {
+            padding: 0.75rem 1.5rem;
+            background: var(--bg-secondary);
+            border: 2px solid var(--bg-tertiary);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-tab:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+        
+        .nav-tab.active {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-tertiary));
+            border-color: var(--accent-primary);
+            color: var(--bg-primary);
+        }
+        
+        .section { display: none; }
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: var(--accent-primary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--bg-tertiary);
+        }
+        
+        h3 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2rem;
+            color: var(--accent-warning);
+            margin: 1.5rem 0 1rem;
+        }
+        
+        h4 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1rem;
+            color: var(--accent-success);
+            margin: 1rem 0 0.5rem;
+        }
+        
+        .command-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .command-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid var(--bg-tertiary);
+            transition: all 0.3s ease;
+        }
+        
+        .command-card:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 245, 255, 0.1);
+        }
+        
+        .command-name {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.1rem;
+            color: var(--text-code);
+            background: var(--bg-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            display: inline-block;
+            margin-bottom: 0.75rem;
+        }
+        
+        .command-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .command-example {
+            background: var(--bg-primary);
+            padding: 0.75rem;
+            border-radius: 6px;
+            border-left: 3px solid var(--accent-success);
+        }
+        
+        .command-example code {
+            color: var(--text-code);
+            font-size: 0.85rem;
+        }
+        
+        .syntax-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--bg-tertiary);
+        }
+        
+        .syntax-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            color: var(--accent-tertiary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .syntax-code {
+            background: var(--bg-primary);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow-x: auto;
+        }
+        
+        .syntax-code pre {
+            color: var(--text-code);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+        
+        .syntax-note {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            padding: 0.75rem;
+            background: rgba(177, 78, 255, 0.1);
+            border-radius: 6px;
+            border-left: 3px solid var(--accent-tertiary);
+        }
+        
+        .syntax-explanation {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.7;
+            margin-top: 0.75rem;
+        }
+        
+        .world-section { margin-bottom: 3rem; }
+        
+        .world-header {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            color: var(--accent-secondary);
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: linear-gradient(90deg, rgba(255, 45, 117, 0.2), transparent);
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-secondary);
+        }
+        
+        .level-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            border: 1px solid var(--bg-tertiary);
+            overflow: hidden;
+        }
+        
+        .level-header {
+            padding: 0.75rem 1rem;
+            background: var(--bg-secondary);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+        
+        .level-header:hover { background: var(--bg-tertiary); }
+        
+        .level-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .level-number {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-tertiary));
+            color: var(--bg-primary);
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+        
+        .toggle-icon {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            transition: transform 0.3s ease;
+        }
+        
+        .level-card.open .toggle-icon { transform: rotate(180deg); }
+        
+        .level-content {
+            display: none;
+            padding: 1rem;
+            border-top: 1px solid var(--bg-tertiary);
+        }
+        
+        .level-card.open .level-content { display: block; }
+        
+        .code-block {
+            background: var(--bg-primary);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--bg-tertiary);
+            margin-top: 0.5rem;
+        }
+        
+        .code-block pre {
+            color: var(--text-code);
+            font-size: 0.85rem;
+            line-height: 1.6;
+            margin: 0;
+            white-space: pre-wrap;
+        }
+        
+        .code-label {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.9rem;
+            color: var(--accent-success);
+            margin-top: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .copy-btn {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: none;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: auto;
+        }
+        
+        .copy-btn:hover {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+        }
+        
+        .info-box {
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        
+        .info-box.tip {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid var(--accent-success);
+        }
+        
+        .info-box.warning {
+            background: rgba(255, 204, 0, 0.1);
+            border: 1px solid var(--accent-warning);
+        }
+        
+        .info-box.info {
+            background: rgba(0, 245, 255, 0.1);
+            border: 1px solid var(--accent-primary);
+        }
+        
+        .info-box-title {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .quick-ref-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        
+        .quick-ref-table th,
+        .quick-ref-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--bg-tertiary);
+        }
+        
+        .quick-ref-table th {
+            background: var(--bg-secondary);
+            color: var(--accent-primary);
+            font-family: 'Fredoka', sans-serif;
+        }
+        
+        .quick-ref-table td code {
+            background: var(--bg-primary);
+            color: var(--text-code);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+        
+        .quick-ref-table tr:hover { background: var(--bg-tertiary); }
+        
+        /* Concept Cards for JS Guide */
+        .concept-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--bg-tertiary);
+        }
+        
+        .concept-card h4 {
+            color: var(--accent-primary);
+            border-bottom: 1px solid var(--bg-tertiary);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .concept-list {
+            list-style: none;
+            margin: 0.5rem 0;
+        }
+        
+        .concept-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed var(--bg-tertiary);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+        
+        .concept-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .concept-list .icon {
+            font-size: 1.2rem;
+            min-width: 1.5rem;
+        }
+        
+        .concept-list code {
+            background: var(--bg-primary);
+            color: var(--text-code);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+        
+        .two-column {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        @media print {
+            body { background: white; color: black; }
+            .starfield, .nav-tabs, .copy-btn, .back-link { display: none; }
+            .section { display: block !important; }
+            .level-content { display: block !important; }
+        }
+        
+        @media (max-width: 768px) {
+            .command-grid { grid-template-columns: 1fr; }
+            .two-column { grid-template-columns: 1fr; }
+            h1 { font-size: 1.8rem; }
+            .nav-tab { padding: 0.5rem 1rem; font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="starfield" id="starfield"></div>
+    
+    <div class="container">
+        <header>
+            <h1>📖 CodeQuest リファレンス</h1>
+            <p class="subtitle">全80レベル - コマンド・構文・解答ガイド</p>
+            <a href="index.html" class="back-link">← ゲームに戻る</a>
+        </header>
+        
+        <nav class="nav-tabs">
+            <button class="nav-tab active" data-section="commands">🤖 コマンド</button>
+            <button class="nav-tab" data-section="jsguide">📚 JSガイド</button>
+            <button class="nav-tab" data-section="code-explanation">📖 コード説明</button>
+            <button class="nav-tab" data-section="syntax">📝 構文</button>
+            <button class="nav-tab" data-section="levels">🎮 全レベル</button>
+            <button class="nav-tab" data-section="quickref">📋 早見表</button>
+        </nav>
+        
+        <!-- COMMANDS SECTION -->
+        <section id="commands" class="section active">
+            <h2>🤖 ロボットコマンド一覧</h2>
+            
+            <h3>移動コマンド</h3>
+            <div class="command-grid">
+                <div class="command-card">
+                    <div class="command-name">robot.move()</div>
+                    <p class="command-desc">ロボットを右に1マス移動させます。障害物があるとぶつかります。</p>
+                    <div class="command-example">
+                        <code>robot.move(); // 右に1マス移動</code>
+                    </div>
+                </div>
+                
+                <div class="command-card">
+                    <div class="command-name">robot.moveUp()</div>
+                    <p class="command-desc">ロボットを上に1マス移動させます。</p>
+                    <div class="command-example">
+                        <code>robot.moveUp(); // 上に1マス移動</code>
+                    </div>
+                </div>
+                
+                <div class="command-card">
+                    <div class="command-name">robot.moveDown()</div>
+                    <p class="command-desc">ロボットを下に1マス移動させます。</p>
+                    <div class="command-example">
+                        <code>robot.moveDown(); // 下に1マス移動</code>
+                    </div>
+                </div>
+                
+                <div class="command-card">
+                    <div class="command-name">robot.jump()</div>
+                    <p class="command-desc">ロボットをジャンプさせて右に1マス移動。障害物を飛び越えられます。</p>
+                    <div class="command-example">
+                        <code>robot.jump(); // ジャンプして障害物を越える</code>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>収集コマンド</h3>
+            <div class="command-grid">
+                <div class="command-card">
+                    <div class="command-name">robot.collect()</div>
+                    <p class="command-desc">現在位置にある星（⭐）を収集します。</p>
+                    <div class="command-example">
+                        <code>robot.collect(); // 星を収集</code>
+                    </div>
+                </div>
+                
+                <div class="command-card">
+                    <div class="command-name">robot.collectGem()</div>
+                    <p class="command-desc">現在位置にあるジェム（💎）を収集します。</p>
+                    <div class="command-example">
+                        <code>robot.collectGem(); // ジェムを収集</code>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>チェックコマンド（条件判定）</h3>
+            <div class="command-grid">
+                <div class="command-card">
+                    <div class="command-name">robot.isObstacle()</div>
+                    <p class="command-desc">前方（右隣）に障害物があるかチェック。あれば <code>true</code>、なければ <code>false</code>。</p>
+                    <div class="command-example">
+                        <code>if (robot.isObstacle()) {<br>  robot.jump();<br>}</code>
+                    </div>
+                </div>
+                
+                <div class="command-card">
+                    <div class="command-name">robot.isStar()</div>
+                    <p class="command-desc">現在位置に星があるかチェック。</p>
+                    <div class="command-example">
+                        <code>if (robot.isStar()) {<br>  robot.collect();<br>}</code>
+                    </div>
+                </div>
+                
+                <div class="command-card">
+                    <div class="command-name">robot.isGem()</div>
+                    <p class="command-desc">現在位置にジェムがあるかチェック。</p>
+                    <div class="command-example">
+                        <code>if (robot.isGem()) {<br>  robot.collectGem();<br>}</code>
+                    </div>
+                </div>
+                
+                <div class="command-card">
+                    <div class="command-name">robot.isGoal()</div>
+                    <p class="command-desc">現在位置がゴールかチェック。</p>
+                    <div class="command-example">
+                        <code>while (!robot.isGoal()) {<br>  robot.move();<br>}</code>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>状態プロパティ</h3>
+            <div class="command-grid">
+                <div class="command-card">
+                    <div class="command-name">robot.x / robot.y</div>
+                    <p class="command-desc">ロボットの現在座標。xは横位置、yは縦位置（上がマイナス）。</p>
+                    <div class="command-example">
+                        <code>while (robot.x < 5) {<br>  robot.move();<br>}</code>
+                    </div>
+                </div>
+                
+                <div class="command-card">
+                    <div class="command-name">robot.starsCollected</div>
+                    <p class="command-desc">収集した星の数。</p>
+                    <div class="command-example">
+                        <code>log("星: " + robot.starsCollected + "個");</code>
+                    </div>
+                </div>
+                
+                <div class="command-card">
+                    <div class="command-name">robot.gemsCollected</div>
+                    <p class="command-desc">収集したジェムの数。</p>
+                    <div class="command-example">
+                        <code>log("ジェム: " + robot.gemsCollected + "個");</code>
+                    </div>
+                </div>
+                
+                <div class="command-card">
+                    <div class="command-name">log(メッセージ)</div>
+                    <p class="command-desc">出力エリアにメッセージを表示。デバッグに便利！</p>
+                    <div class="command-example">
+                        <code>log("こんにちは!");<br>log("位置: " + robot.x);</code>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- JAVASCRIPT GUIDE SECTION -->
+        <section id="jsguide" class="section">
+            <h2>📚 JavaScript 基礎ガイド</h2>
+            
+            <div class="info-box info">
+                <div class="info-box-title">🎯 このガイドについて</div>
+                <p>JavaScriptはWebサイトやアプリを動かすプログラミング言語です。CodeQuestでは、JavaScriptを使ってロボットを操作します。ここでは、ゲームで使う基本的な概念を学びましょう！</p>
+            </div>
+            
+            <!-- 変数 -->
+            <h3>📦 変数 (Variables)</h3>
+            <div class="concept-card">
+                <h4>変数とは？</h4>
+                <p class="syntax-explanation">
+                    変数は「データを入れる箱」です。名前をつけて、後で使いたい値を保存できます。<br>
+                    JavaScriptでは <code>let</code>、<code>const</code> を使って変数を作ります。
+                </p>
+                
+                <div class="syntax-code">
+                    <pre>// let - 後で値を変更できる変数
+let score = 0;
+score = 10;  // OK! 値を変更できる
+
+// const - 値を変更できない定数
+const MAX_LEVEL = 80;
+// MAX_LEVEL = 100;  // エラー！変更できない
+
+// 変数の使い方
+let steps = 5;
+for (let i = 0; i < steps; i++) {
+    robot.move();
+}</pre>
+                </div>
+                
+                <div class="info-box tip">
+                    <div class="info-box-title">💡 ヒント</div>
+                    <p>変数名は分かりやすい名前をつけましょう！<code>x</code> より <code>playerScore</code> の方が何を表しているか分かりやすいです。</p>
+                </div>
+            </div>
+            
+            <!-- データ型 -->
+            <h3>🔤 データ型 (Data Types)</h3>
+            <div class="concept-card">
+                <h4>JavaScriptの主なデータ型</h4>
+                <p class="syntax-explanation">
+                    データには種類（型）があります。数字、文字、真偽値など、用途に合わせて使い分けます。
+                </p>
+                
+                <ul class="concept-list">
+                    <li>
+                        <span class="icon">🔢</span>
+                        <div>
+                            <strong>数値 (Number)</strong> - 計算に使う数字<br>
+                            <code>let age = 25;</code> <code>let price = 99.99;</code>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="icon">📝</span>
+                        <div>
+                            <strong>文字列 (String)</strong> - テキストデータ<br>
+                            <code>let name = "太郎";</code> <code>let message = 'こんにちは';</code>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="icon">✅</span>
+                        <div>
+                            <strong>真偽値 (Boolean)</strong> - true（真）か false（偽）<br>
+                            <code>let isPlaying = true;</code> <code>let hasKey = false;</code>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="icon">📋</span>
+                        <div>
+                            <strong>配列 (Array)</strong> - 複数の値をまとめたリスト<br>
+                            <code>let colors = ["赤", "青", "緑"];</code>
+                        </div>
+                    </li>
+                </ul>
+                
+                <div class="syntax-code">
+                    <pre>// 型の確認には typeof を使う
+log(typeof 42);        // "number"
+log(typeof "hello");   // "string"
+log(typeof true);      // "boolean"
+
+// CodeQuestでの例
+log(typeof robot.x);              // "number"
+log(typeof robot.isGoal());       // "boolean"</pre>
+                </div>
+            </div>
+            
+            <!-- 演算子 -->
+            <h3>➕ 演算子 (Operators)</h3>
+            <div class="two-column">
+                <div class="concept-card">
+                    <h4>算術演算子</h4>
+                    <p class="syntax-explanation">数値の計算に使います。</p>
+                    <ul class="concept-list">
+                        <li><span class="icon">➕</span><div><code>+</code> 足し算: <code>5 + 3</code> → 8</div></li>
+                        <li><span class="icon">➖</span><div><code>-</code> 引き算: <code>10 - 4</code> → 6</div></li>
+                        <li><span class="icon">✖️</span><div><code>*</code> 掛け算: <code>3 * 4</code> → 12</div></li>
+                        <li><span class="icon">➗</span><div><code>/</code> 割り算: <code>15 / 3</code> → 5</div></li>
+                        <li><span class="icon">🔢</span><div><code>%</code> 余り: <code>7 % 3</code> → 1</div></li>
+                        <li><span class="icon">⬆️</span><div><code>++</code> 1増やす: <code>i++</code></div></li>
+                    </ul>
+                </div>
+                
+                <div class="concept-card">
+                    <h4>比較演算子</h4>
+                    <p class="syntax-explanation">2つの値を比較して true/false を返します。</p>
+                    <ul class="concept-list">
+                        <li><span class="icon">🟰</span><div><code>===</code> 等しい: <code>5 === 5</code> → true</div></li>
+                        <li><span class="icon">≠</span><div><code>!==</code> 等しくない: <code>5 !== 3</code> → true</div></li>
+                        <li><span class="icon">＞</span><div><code>&gt;</code> より大きい: <code>10 > 5</code> → true</div></li>
+                        <li><span class="icon">＜</span><div><code>&lt;</code> より小さい: <code>3 < 7</code> → true</div></li>
+                        <li><span class="icon">≥</span><div><code>&gt;=</code> 以上: <code>5 >= 5</code> → true</div></li>
+                        <li><span class="icon">≤</span><div><code>&lt;=</code> 以下: <code>3 <= 4</code> → true</div></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="concept-card">
+                <h4>論理演算子</h4>
+                <p class="syntax-explanation">複数の条件を組み合わせるときに使います。</p>
+                
+                <div class="syntax-code">
+                    <pre>// AND (&&) - 両方trueならtrue
+if (robot.isStar() && robot.x > 2) {
+    robot.collect();  // 星があり、かつx座標が2より大きいとき
+}
+
+// OR (||) - どちらかがtrueならtrue
+if (robot.isStar() || robot.isGem()) {
+    log("何か見つけた！");  // 星かジェムがあるとき
+}
+
+// NOT (!) - 真偽を反転
+if (!robot.isGoal()) {
+    robot.move();  // ゴールじゃないとき
+}</pre>
+                </div>
+                
+                <table class="quick-ref-table">
+                    <thead>
+                        <tr><th>A</th><th>B</th><th>A && B</th><th>A || B</th><th>!A</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>true</td><td>true</td><td>true</td><td>true</td><td>false</td></tr>
+                        <tr><td>true</td><td>false</td><td>false</td><td>true</td><td>false</td></tr>
+                        <tr><td>false</td><td>true</td><td>false</td><td>true</td><td>true</td></tr>
+                        <tr><td>false</td><td>false</td><td>false</td><td>false</td><td>true</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        
+
+
+
+            <!-- 条件分岐 -->
+            <h3>🔀 条件分岐 (if文)</h3>
+            <div class="concept-card">
+                <h4>if文 - 「もし〜なら」</h4>
+                <p class="syntax-explanation">
+                    条件によって処理を分けたいときに使います。条件が <code>true</code> のときだけ、中のコードが実行されます。
+                </p>
+                
+                <div class="syntax-code">
+                    <pre>// 基本形: if
+if (条件) {
+    // 条件がtrueのとき実行
+}
+
+// if-else: 2択
+if (robot.isObstacle()) {
+    robot.jump();    // 障害物があればジャンプ
+} else {
+    robot.move();    // なければ普通に移動
+}
+
+// if-else if-else: 複数の条件
+if (robot.x < 3) {
+    log("まだ序盤");
+} else if (robot.x < 6) {
+    log("中盤");
+} else {
+    log("終盤！");
+}</pre>
+                </div>
+                
+                <div class="info-box warning">
+                    <div class="info-box-title">⚠️ 注意</div>
+                    <p><code>=</code> は代入、<code>===</code> は比較です！<br>
+                    <code>if (x = 5)</code> ← 間違い（xに5を代入）<br>
+                    <code>if (x === 5)</code> ← 正しい（xが5か比較）</p>
+                </div>
+            </div>
+            
+            <!-- ループ -->
+            <h3>🔄 ループ (繰り返し)</h3>
+            <div class="concept-card">
+                <h4>繰り返し処理</h4>
+                <p class="syntax-explanation">
+                    同じ処理を何度も実行したいときに使います。手動で何回もコードを書く必要がなくなります！
+                </p>
+                
+                <div class="two-column">
+                    <div>
+                        <h4>for ループ</h4>
+                        <p class="syntax-explanation">回数が決まっているときに便利。</p>
+                        <div class="syntax-code">
+                            <pre>// 5回繰り返す
+for (let i = 0; i < 5; i++) {
+    robot.move();
+}
+
+// 構造:
+// for (初期化; 条件; 更新) {
+//     繰り返す処理
+// }
+
+// i = 0 → 条件チェック → 処理 → i++
+// i = 1 → 条件チェック → 処理 → i++
+// ... i = 5 → 条件false → 終了</pre>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4>while ループ</h4>
+                        <p class="syntax-explanation">条件が真の間ずっと繰り返す。</p>
+                        <div class="syntax-code">
+                            <pre>// ゴールに着くまで繰り返す
+while (!robot.isGoal()) {
+    robot.move();
+}
+
+// 星を3個集めるまで
+while (robot.starsCollected < 3) {
+    robot.move();
+    if (robot.isStar()) {
+        robot.collect();
+    }
+}</pre>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-box warning">
+                    <div class="info-box-title">⚠️ 無限ループに注意！</div>
+                    <p>while文の条件が永遠にtrueだと、プログラムが止まらなくなります。<br>
+                    必ず条件がfalseになるようにしましょう！</p>
+                </div>
+            </div>
+            
+            <!-- 関数 -->
+            <h3>⚙️ 関数 (Functions)</h3>
+            <div class="concept-card">
+                <h4>関数とは？</h4>
+                <p class="syntax-explanation">
+                    関数は「処理をまとめて名前をつけたもの」です。<br>
+                    同じ処理を何度も使い回せるので、コードがスッキリします！
+                </p>
+                
+                <div class="syntax-code">
+                    <pre>// 基本的な関数の定義
+function sayHello() {
+    log("こんにちは！");
+}
+
+// 関数の呼び出し
+sayHello();  // "こんにちは！" が表示される
+
+// 引数（パラメータ）を受け取る関数
+function moveSteps(times) {
+    for (let i = 0; i < times; i++) {
+        robot.move();
+    }
+}
+moveSteps(5);  // 5回移動
+
+// 戻り値を返す関数
+function getTotal() {
+    return robot.starsCollected + robot.gemsCollected;
+}
+let total = getTotal();  // 収集した合計を取得</pre>
+                </div>
+            </div>
+            
+            <div class="concept-card">
+                <h4>関数を使うメリット</h4>
+                <ul class="concept-list">
+                    <li>
+                        <span class="icon">♻️</span>
+                        <div><strong>再利用</strong> - 同じコードを何度も書かなくていい</div>
+                    </li>
+                    <li>
+                        <span class="icon">📖</span>
+                        <div><strong>読みやすさ</strong> - 処理に名前がつくので分かりやすい</div>
+                    </li>
+                    <li>
+                        <span class="icon">🔧</span>
+                        <div><strong>修正しやすさ</strong> - 一箇所直せば全部に反映される</div>
+                    </li>
+                </ul>
+                
+                <div class="syntax-code">
+                    <pre>// 関数を使わない場合 ❌
+if (robot.isObstacle()) { robot.jump(); } else { robot.move(); }
+if (robot.isStar()) { robot.collect(); }
+if (robot.isObstacle()) { robot.jump(); } else { robot.move(); }
+if (robot.isStar()) { robot.collect(); }
+// ...同じコードの繰り返し...
+
+// 関数を使う場合 ✅
+function step() {
+    if (robot.isObstacle()) { robot.jump(); } else { robot.move(); }
+    if (robot.isStar()) { robot.collect(); }
+}
+
+for (let i = 0; i < 5; i++) {
+    step();  // スッキリ！
+}</pre>
+                </div>
+            </div>
+            
+            <!-- 配列 -->
+            <h3>📋 配列 (Arrays)</h3>
+            <div class="concept-card">
+                <h4>配列の基本</h4>
+                <p class="syntax-explanation">
+                    配列は複数の値を順番に並べて管理できるデータ構造です。<br>
+                    インデックス（番号）は <strong>0から始まる</strong> ことに注意！
+                </p>
+                
+                <div class="syntax-code">
+                    <pre>// 配列の作成
+let fruits = ["りんご", "バナナ", "みかん"];
+
+// インデックスでアクセス（0から始まる！）
+log(fruits[0]);  // "りんご"
+log(fruits[1]);  // "バナナ"
+log(fruits[2]);  // "みかん"
+
+// 配列の長さ
+log(fruits.length);  // 3
+
+// 要素の追加
+fruits.push("ぶどう");  // ["りんご", "バナナ", "みかん", "ぶどう"]
+
+// 配列をループで処理
+for (let i = 0; i < fruits.length; i++) {
+    log(fruits[i]);
+}</pre>
+                </div>
+            </div>
+            
+            <!-- デバッグ -->
+            <h3>🐛 デバッグのコツ</h3>
+            <div class="concept-card">
+                <h4>エラーの見つけ方・直し方</h4>
+                
+                <ul class="concept-list">
+                    <li>
+                        <span class="icon">📍</span>
+                        <div>
+                            <strong>log() を使う</strong><br>
+                            <code>log(robot.x);</code> で現在位置を確認
+                        </div>
+                    </li>
+                    <li>
+                        <span class="icon">🔍</span>
+                        <div>
+                            <strong>エラーメッセージを読む</strong><br>
+                            どこで何が間違っているか教えてくれる
+                        </div>
+                    </li>
+                    <li>
+                        <span class="icon">✂️</span>
+                        <div>
+                            <strong>小さく分けてテスト</strong><br>
+                            一度に全部書かず、少しずつ動作確認
+                        </div>
+                    </li>
+                </ul>
+                
+                <div class="syntax-code">
+                    <pre>// よくあるエラーと対処法
+
+// ❌ SyntaxError: セミコロン忘れ
+robot.move()  // ← ; がない
+robot.jump();
+
+// ✅ 修正
+robot.move();
+robot.jump();
+
+// デバッグ例
+for (let i = 0; i < 5; i++) {
+    log("ループ " + i + " 回目");  // 進行状況を確認
+    log("現在位置: " + robot.x);
+    robot.move();
+}</pre>
+                </div>
+            </div>
+        </section>
+        
+<!-- 既存のコード説明セクションに追加 -->
+
+<section id="code-explanation" class="section">
+    <!-- 既存の内容... -->
+    
+    <h3>例8: ロボットクラスの内部実装</h3>
+    <div class="syntax-card">
+        <div class="syntax-title">robotオブジェクトの仕組み</div>
+        <div class="syntax-code">
+            <pre>// 実際のCodeQuestではこのようなクラスで実装されています
+class Robot {
+    constructor() {
+        // 初期位置
+        this.x = 0;
+        this.y = 0;
+        
+        // 収集アイテム
+        this.starsCollected = 0;
+        this.gemsCollected = 0;
+        
+        // ゲームボードの状態
+        this.board = [
+            ['R', '.', '.', '.', '⭐', '.', 'G'],
+            ['.', '#', '.', '⭐', '.', '.', '.'],
+            // ... 各レベルのマップデータ
+        ];
+    }
+    
+    // 移動メソッド
+    move() {
+        // 次の位置を計算
+        const nextX = this.x + 1;
+        const nextY = this.y;
+        
+        // 障害物チェック
+        if (this.isBlocked(nextX, nextY)) {
+            throw new Error("障害物にぶつかりました！");
+        }
+        
+        // 現在位置のアイテムをチェック
+        this.checkCurrentCell();
+        
+        // 位置を更新
+        this.x = nextX;
+        
+        // アニメーションを表示
+        this.showAnimation('move');
+    }
+    
+    moveUp() {
+        const nextX = this.x;
+        const nextY = this.y - 1; // 上はy座標が減る
+        
+        if (this.isBlocked(nextX, nextY)) {
+            throw new Error("障害物にぶつかりました！");
+        }
+        
+        this.checkCurrentCell();
+        this.y = nextY;
+        this.showAnimation('moveUp');
+    }
+    
+    moveDown() {
+        const nextX = this.x;
+        const nextY = this.y + 1; // 下はy座標が増える
+        
+        if (this.isBlocked(nextX, nextY)) {
+            throw new Error("障害物にぶつかりました！");
+        }
+        
+        this.checkCurrentCell();
+        this.y = nextY;
+        this.showAnimation('moveDown');
+    }
+    
+    jump() {
+        const nextX = this.x + 1;
+        const nextY = this.y;
+        
+        // ジャンプは障害物を無視
+        this.checkCurrentCell();
+        this.x = nextX;
+        this.showAnimation('jump');
+    }
+    
+    // 収集メソッド
+    collect() {
+        if (this.isStar()) {
+            this.starsCollected++;
+            this.removeItem('⭐');
+            this.showAnimation('collect');
+        }
+    }
+    
+    collectGem() {
+        if (this.isGem()) {
+            this.gemsCollected++;
+            this.removeItem('💎');
+            this.showAnimation('collectGem');
+        }
+    }
+    
+    // チェックメソッド
+    isObstacle() {
+        const nextX = this.x + 1;
+        const nextY = this.y;
+        return this.isBlocked(nextX, nextY);
+    }
+    
+    isStar() {
+        const cell = this.board[this.y][this.x];
+        return cell === '⭐';
+    }
+    
+    isGem() {
+        const cell = this.board[this.y][this.x];
+        return cell === '💎';
+    }
+    
+    isGoal() {
+        const cell = this.board[this.y][this.x];
+        return cell === 'G';
+    }
+    
+    // 内部処理メソッド
+    isBlocked(x, y) {
+        // ボードの範囲外チェック
+        if (y < 0 || y >= this.board.length) return true;
+        if (x < 0 || x >= this.board[y].length) return true;
+        
+        // 障害物チェック
+        const cell = this.board[y][x];
+        return cell === '#';
+    }
+    
+    checkCurrentCell() {
+        // 現在位置にアイテムがあれば自動収集（ゲームによっては手動）
+        if (this.isStar()) this.collect();
+        if (this.isGem()) this.collectGem();
+    }
+    
+    removeItem(itemType) {
+        // 収集したアイテムをボードから削除
+        this.board[this.y][this.x] = '.';
+    }
+    
+    showAnimation(type) {
+        // 画面にアニメーションを表示
+        console.log(`アニメーション: ${type}`);
+    }
+}</pre>
+        </div>
+        <div class="syntax-explanation">
+            <h4>📝 クラスの仕組み解説</h4>
+            
+            <p><strong>1. コンストラクタ (constructor)</strong></p>
+            <ul>
+                <li><code>this.x</code>, <code>this.y</code> - ロボットの現在位置を保存</li>
+                <li><code>this.starsCollected</code>, <code>this.gemsCollected</code> - 収集アイテムのカウンタ</li>
+                <li><code>this.board</code> - ゲームボードの状態を2次元配列で保持</li>
+            </ul>
+            
+            <p><strong>2. 移動メソッドの内部処理</strong></p>
+            <ul>
+                <li><code>move()</code>:
+                    <ol>
+                        <li>次の位置を計算 (<code>this.x + 1</code>)</li>
+                        <li>障害物チェック (<code>this.isBlocked()</code>)</li>
+                        <li>現在位置のアイテムをチェック</li>
+                        <li>位置を更新</li>
+                        <li>アニメーションを表示</li>
+                    </ol>
+                </li>
+                <li><code>moveUp()</code>: y座標を1減らす（画面では上がマイナス）</li>
+                <li><code>moveDown()</code>: y座標を1増やす</li>
+                <li><code>jump()</code>: 障害物チェックをスキップ</li>
+            </ul>
+            
+            <p><strong>3. 座標系の仕組み</strong></p>
+            <div class="syntax-code">
+                <pre>// ゲームボードの座標例
+ボード: [
+    [0,0, 0,1, 0,2, 0,3],  // 行0 (y=0)
+    [1,0, 1,1, 1,2, 1,3],  // 行1 (y=1)
+    [2,0, 2,1, 2,2, 2,3],  // 行2 (y=2)
+]
+
+// 上に移動: y - 1
+// 下に移動: y + 1
+// 右に移動: x + 1
+// 左に移動: x - 1</pre>
+            </div>
+            
+            <p><strong>4. 収集処理の流れ</strong></p>
+            <ol>
+                <li><code>isStar()</code> で星の有無を確認</li>
+                <li>あれば <code>starsCollected++</code> でカウント増加</li>
+                <li><code>removeItem()</code> でボードから削除</li>
+                <li>アニメーションを表示</li>
+            </ol>
+        </div>
+    </div>
+    
+    <!-- 実践的な例 -->
+    <h3>例9: 実際の呼び出しと内部動作</h3>
+    <div class="syntax-card">
+        <div class="syntax-title">コードの実行フロー</div>
+        <div class="syntax-code">
+            <pre>// ユーザーが書くコード
+robot.move();
+robot.collect();
+
+// 内部で起こること
+// 1. robot.move() の実行:
+//    - 現在位置: (0,0)
+//    - 次の位置: (1,0) を計算
+//    - 障害物がないかチェック
+//    - (0,0)にアイテムがあれば自動収集
+//    - 位置を(1,0)に更新
+//    - 移動アニメーションを表示
+
+// 2. robot.collect() の実行:
+//    - isStar()で(1,0)に星があるかチェック
+//    - あれば:
+//        * starsCollectedを1増やす
+//        * ボードから星を削除
+//        * 収集アニメーションを表示</pre>
+        </div>
+        <div class="syntax-explanation">
+            <h4>📝 内部状態の変化</h4>
+            
+            <table class="quick-ref-table">
+                <thead>
+                    <tr><th>実行前</th><th>コマンド</th><th>実行後</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>x=0, y=0<br>stars=0</td>
+                        <td><code>robot.move();</code></td>
+                        <td>x=1, y=0<br>stars=0</td>
+                    </tr>
+                    <tr>
+                        <td>x=1, y=0<br>stars=0<br>ボード[0][1]="⭐"</td>
+                        <td><code>robot.collect();</code></td>
+                        <td>x=1, y=0<br>stars=1<br>ボード[0][1]="."</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <p><strong>デバッグ表示の追加:</strong></p>
+            <div class="syntax-code">
+                <pre>// 内部状態を確認する改良版move()
+move() {
+    console.log(`移動前: (${this.x}, ${this.y})`);
+    
+    const nextX = this.x + 1;
+    const nextY = this.y;
+    
+    console.log(`移動先: (${nextX}, ${nextY})`);
+    console.log(`障害物？: ${this.isBlocked(nextX, nextY)}`);
+    
+    // 通常の処理...
+    
+    console.log(`移動後: (${this.x}, ${this.y})`);
+}</pre>
+            </div>
+        </div>
+    </div>
+    
+    <!-- オブジェクト指向の基本 -->
+    <h3>例10: オブジェクト指向の基本概念</h3>
+    <div class="syntax-card">
+        <div class="syntax-title">クラスとオブジェクト</div>
+        <div class="syntax-code">
+            <pre>// クラスの定義（設計図）
+class Robot {
+    constructor(name) {
+        this.name = name;
+        this.x = 0;
+        this.y = 0;
+    }
+    
+    move() {
+        this.x++;
+        console.log(`${this.name}が移動: (${this.x}, ${this.y})`);
+    }
+    
+    getPosition() {
+        return { x: this.x, y: this.y };
+    }
+}
+
+// オブジェクトの作成（実体）
+const robot1 = new Robot("ロボットA");
+const robot2 = new Robot("ロボットB");
+
+// メソッドの呼び出し
+robot1.move();  // "ロボットAが移動: (1, 0)"
+robot2.move();  // "ロボットBが移動: (1, 0)"
+
+// プロパティへのアクセス
+console.log(robot1.x);  // 1
+console.log(robot2.x);  // 1</pre>
+        </div>
+        <div class="syntax-explanation">
+            <h4>📝 オブジェクト指向のキーポイント</h4>
+            
+            <p><strong>1. クラス (Class)</strong></p>
+            <ul>
+                <li>オブジェクトの設計図</li>
+                <li>プロパティ（データ）とメソッド（機能）を定義</li>
+                <li><code>constructor()</code> で初期化</li>
+            </ul>
+            
+            <p><strong>2. オブジェクト (Object)</strong></p>
+            <ul>
+                <li>クラスから作られる実体</li>
+                <li><code>new ClassName()</code> で作成</li>
+                <li>それぞれ独立したデータを持つ</li>
+            </ul>
+            
+            <p><strong>3. CodeQuestのrobotオブジェクト</strong></p>
+            <ul>
+                <li>ゲーム開始時に自動的に作成される</li>
+                <li>プレイヤーは既存のオブジェクトを操作するだけ</li>
+                <li><code>robot.move()</code> は既存メソッドの呼び出し</li>
+            </ul>
+            
+            <div class="info-box tip">
+                <div class="info-box-title">💡 thisキーワード</div>
+                <p><code>this</code> は「このオブジェクト自身」を指します。</p>
+                <ul>
+                    <li><code>this.x</code> - このロボットのx座標</li>
+                    <li><code>this.move()</code> - このロボットのmoveメソッド</li>
+                    <li>各ロボットが自分自身のデータを持てる</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 演習問題 -->
+    <h3>演習: ロボットクラスを作ってみよう</h3>
+    <div class="concept-card">
+        <h4>簡易ロボットクラスの実装</h4>
+        
+        <div class="syntax-code">
+            <pre>// 演習問題: 以下の機能を持つRobotクラスを作成してください
+// 1. 初期位置を(0,0)にする
+// 2. moveRight()メソッドで右に移動
+// 3. moveLeft()メソッドで左に移動
+// 4. getPosition()で現在位置を返す
+
+// 解答例
+class Robot {
+    constructor() {
+        this.x = 0;
+        this.y = 0;
+    }
+    
+    moveRight() {
+        this.x++;
+        console.log(`右に移動: (${this.x}, ${this.y})`);
+    }
+    
+    moveLeft() {
+        this.x--;
+        console.log(`左に移動: (${this.x}, ${this.y})`);
+    }
+    
+    getPosition() {
+        return { x: this.x, y: this.y };
+    }
+}
+
+// テスト
+const myRobot = new Robot();
+myRobot.moveRight();  // (1, 0)
+myRobot.moveRight();  // (2, 0)
+myRobot.moveLeft();   // (1, 0)
+console.log(myRobot.getPosition());  // {x: 1, y: 0}</pre>
+        </div>
+        
+        <div class="syntax-explanation">
+            <h4>📝 理解度チェック</h4>
+            
+            <p><strong>問題1:</strong> 以下のコードを実行すると何が表示されますか？</p>
+            <div class="syntax-code">
+                <pre>class Counter {
+    constructor() {
+        this.count = 0;
+    }
+    
+    increment() {
+        this.count++;
+    }
+    
+    getValue() {
+        return this.count;
+    }
+}
+
+const c1 = new Counter();
+c1.increment();
+c1.increment();
+console.log(c1.getValue());</pre>
+            </div>
+            
+            <p><strong>問題2:</strong> 上下移動もできるRobotクラスを拡張してください。</p>
+            <p><strong>問題3:</strong> 移動回数を記録する<code>totalMoves</code>プロパティを追加してください。</p>
+            
+            <div class="info-box info">
+                <div class="info-box-title">💡 ヒント</div>
+                <p>実際のCodeQuestでは、robotオブジェクトはもっと多くの機能を持っていますが、基本は同じです。メソッドを呼ぶ → 内部状態が変わる → 結果が返る、という流れを理解しましょう。</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+        
+        <!-- SYNTAX SECTION -->
+        <section id="syntax" class="section">
+            <h2>📝 JavaScript 構文早見</h2>
+            
+            <div class="syntax-card">
+                <div class="syntax-title">🔄 for ループ</div>
+                <div class="syntax-code">
+                    <pre>for (let i = 0; i < 回数; i++) {
+    // 繰り返す処理
+}
+
+// 例: 5回移動
+for (let i = 0; i < 5; i++) {
+    robot.move();
+}</pre>
+                </div>
+            </div>
+            
+            <div class="syntax-card">
+                <div class="syntax-title">🔁 while ループ</div>
+                <div class="syntax-code">
+                    <pre>while (条件) {
+    // 条件がtrueの間繰り返す
+}
+
+// 例: ゴールに着くまで移動
+while (!robot.isGoal()) {
+    robot.move();
+}</pre>
+                </div>
+            </div>
+            
+            <div class="syntax-card">
+                <div class="syntax-title">❓ if 文（条件分岐）</div>
+                <div class="syntax-code">
+                    <pre>if (条件) {
+    // trueのとき
+} else {
+    // falseのとき
+}
+
+// 例
+if (robot.isObstacle()) {
+    robot.jump();
+} else {
+    robot.move();
+}</pre>
+                </div>
+            </div>
+            
+            <div class="syntax-card">
+                <div class="syntax-title">🧠 論理演算子</div>
+                <div class="syntax-code">
+                    <pre>// AND（両方true）
+if (条件A && 条件B) { }
+
+// OR（どちらかtrue）
+if (条件A || 条件B) { }
+
+// NOT（反転）
+if (!条件) { }</pre>
+                </div>
+            </div>
+            
+            <div class="syntax-card">
+                <div class="syntax-title">⚙️ 関数定義</div>
+                <div class="syntax-code">
+                    <pre>// 基本
+function 関数名() {
+    // 処理
+}
+
+// 引数付き
+function moveSteps(times) {
+    for (let i = 0; i < times; i++) {
+        robot.move();
+    }
+}
+
+// 戻り値
+function getTotal() {
+    return robot.starsCollected + robot.gemsCollected;
+}</pre>
+                </div>
+            </div>
+        </section>
+        
+        <!-- LEVELS SECTION -->
+        <section id="levels" class="section">
+            <h2>🎮 全80レベル 解答集</h2>
+            <div id="levelsContainer"></div>
+        </section>
+        
+        <!-- QUICK REFERENCE SECTION -->
+        <section id="quickref" class="section">
+            <h2>📋 早見表</h2>
+            
+            <h3>🤖 ロボットコマンド</h3>
+            <table class="quick-ref-table">
+                <thead>
+                    <tr><th>コマンド</th><th>説明</th><th>戻り値</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>robot.move()</code></td><td>右に1マス移動</td><td>なし</td></tr>
+                    <tr><td><code>robot.moveUp()</code></td><td>上に1マス移動</td><td>なし</td></tr>
+                    <tr><td><code>robot.moveDown()</code></td><td>下に1マス移動</td><td>なし</td></tr>
+                    <tr><td><code>robot.jump()</code></td><td>ジャンプして右に1マス</td><td>なし</td></tr>
+                    <tr><td><code>robot.collect()</code></td><td>星を収集</td><td>なし</td></tr>
+                    <tr><td><code>robot.collectGem()</code></td><td>ジェムを収集</td><td>なし</td></tr>
+                    <tr><td><code>robot.isObstacle()</code></td><td>前方に障害物？</td><td>true/false</td></tr>
+                    <tr><td><code>robot.isStar()</code></td><td>現在位置に星？</td><td>true/false</td></tr>
+                    <tr><td><code>robot.isGem()</code></td><td>現在位置にジェム？</td><td>true/false</td></tr>
+                    <tr><td><code>robot.isGoal()</code></td><td>ゴールに到達？</td><td>true/false</td></tr>
+                    <tr><td><code>robot.x / robot.y</code></td><td>現在座標</td><td>数値</td></tr>
+                    <tr><td><code>log(message)</code></td><td>メッセージを出力</td><td>なし</td></tr>
+                </tbody>
+            </table>
+            
+            <h3>📝 JavaScript構文</h3>
+            <table class="quick-ref-table">
+                <thead>
+                    <tr><th>構文</th><th>例</th><th>使い方</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>変数</td><td><code>let x = 5;</code></td><td>値を保存</td></tr>
+                    <tr><td>定数</td><td><code>const MAX = 100;</code></td><td>変更不可の値</td></tr>
+                    <tr><td>forループ</td><td><code>for (let i = 0; i < 5; i++) { }</code></td><td>回数を決めて繰り返す</td></tr>
+                    <tr><td>whileループ</td><td><code>while (条件) { }</code></td><td>条件がtrueの間繰り返す</td></tr>
+                    <tr><td>if文</td><td><code>if (条件) { }</code></td><td>条件がtrueなら実行</td></tr>
+                    <tr><td>if-else</td><td><code>if (条件) { } else { }</code></td><td>条件分岐</td></tr>
+                    <tr><td>AND</td><td><code>A && B</code></td><td>両方true</td></tr>
+                    <tr><td>OR</td><td><code>A || B</code></td><td>どちらかtrue</td></tr>
+                    <tr><td>NOT</td><td><code>!A</code></td><td>反転</td></tr>
+                    <tr><td>関数</td><td><code>function name() { }</code></td><td>再利用可能な処理</td></tr>
+                    <tr><td>配列</td><td><code>let arr = [1, 2, 3];</code></td><td>複数の値をまとめる</td></tr>
+                </tbody>
+            </table>
+            
+            <div class="info-box tip">
+                <div class="info-box-title">💡 学習のコツ</div>
+                <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                    <li>まずはヒントを見ずにチャレンジ!</li>
+                    <li>エラーが出たら、メッセージをよく読もう</li>
+                    <li>短いコードほど高スコア ⭐⭐⭐</li>
+                    <li>関数を使うとコードがスッキリ!</li>
+                    <li><code>log()</code> を使ってデバッグしよう</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Create starfield
+        const starfield = document.getElementById('starfield');
+        for (let i = 0; i < 80; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.width = (Math.random() * 2 + 1) + 'px';
+            star.style.height = star.style.width;
+            star.style.animationDelay = Math.random() * 3 + 's';
+            starfield.appendChild(star);
+        }
+        
+        // Level solutions data - ALL 80 LEVELS
+        const levelSolutions = {
+            1: { title: "🚀 最初の一歩", solution: "robot.move();\nrobot.move();" },
+            2: { title: "🏃 3マス進め", solution: "robot.move();\nrobot.move();\nrobot.move();" },
+            3: { title: "🎯 4マス進め", solution: "robot.move();\nrobot.move();\nrobot.move();\nrobot.move();" },
+            4: { title: "⬆️ 上に移動", solution: "robot.move();\nrobot.moveUp();" },
+            5: { title: "⬇️ 下に移動", solution: "robot.move();\nrobot.moveDown();" },
+            6: { title: "↗️ 斜め移動", solution: "robot.move();\nrobot.move();\nrobot.moveUp();" },
+            7: { title: "↘️ 反対の斜め", solution: "robot.move();\nrobot.move();\nrobot.moveDown();" },
+            8: { title: "🔼 上に2マス", solution: "robot.move();\nrobot.moveUp();\nrobot.moveUp();" },
+            9: { title: "⭐ 星を集めよう", solution: "robot.move();\nrobot.collect();\nrobot.move();" },
+            10: { title: "⭐⭐ 2つの星", solution: "robot.move();\nrobot.collect();\nrobot.move();\nrobot.collect();\nrobot.move();" },
+            11: { title: "🧱 障害物だ!", solution: "robot.jump();\nrobot.move();" },
+            12: { title: "🧱➡️ ジャンプと移動", solution: "robot.jump();\nrobot.move();\nrobot.move();" },
+            13: { title: "💎 ジェムを集めろ", solution: "robot.move();\nrobot.collectGem();\nrobot.move();" },
+            14: { title: "⭐💎 星とジェム", solution: "robot.move();\nrobot.collect();\nrobot.move();\nrobot.collectGem();\nrobot.move();" },
+            15: { title: "🏔️ 上下の冒険", solution: "robot.move();\nrobot.moveUp();\nrobot.collect();\nrobot.moveDown();" },
+            16: { title: "🎯 精密操作", solution: "robot.jump();\nrobot.move();\nrobot.collect();\nrobot.move();" },
+            17: { title: "🌟 3つの星", solution: "robot.move();\nrobot.collect();\nrobot.move();\nrobot.collect();\nrobot.move();\nrobot.collect();\nrobot.move();" },
+            18: { title: "🧱🧱 2つの障害物", solution: "robot.jump();\nrobot.move();\nrobot.jump();\nrobot.move();" },
+            19: { title: "💎💎 2つのジェム", solution: "robot.move();\nrobot.collectGem();\nrobot.move();\nrobot.collectGem();\nrobot.move();" },
+            20: { title: "🏆 基礎マスター", solution: "robot.move();\nrobot.collect();\nrobot.jump();\nrobot.move();\nrobot.collect();\nrobot.collectGem();\nrobot.move();" },
+            21: { title: "🔄 forループ入門", solution: "for (let i = 0; i < 3; i++) {\n  robot.move();\n}" },
+            22: { title: "🔄 5マスループ", solution: "for (let i = 0; i < 5; i++) {\n  robot.move();\n}" },
+            23: { title: "🔁 whileループ", solution: "while (robot.x < 4) {\n  robot.move();\n}" },
+            24: { title: "⭐ ループで星", solution: "for (let i = 0; i < 3; i++) {\n  robot.move();\n  robot.collect();\n}\nrobot.move();" },
+            25: { title: "🔢 変数を使おう", solution: "let steps = 3;\nfor (let i = 0; i < steps; i++) {\n  robot.move();\n}" },
+            26: { title: "🧱 ループでジャンプ", solution: "for (let i = 0; i < 2; i++) {\n  robot.jump();\n}\nrobot.move();" },
+            27: { title: "💎 ループでジェム", solution: "for (let i = 0; i < 3; i++) {\n  robot.move();\n  robot.collectGem();\n}\nrobot.move();" },
+            28: { title: "⬆️ ループで上昇", solution: "robot.move();\nfor (let i = 0; i < 3; i++) {\n  robot.moveUp();\n}" },
+            29: { title: "🔀 2つのループ", solution: "for (let i = 0; i < 3; i++) {\n  robot.move();\n}\nfor (let i = 0; i < 2; i++) {\n  robot.moveUp();\n}" },
+            30: { title: "⭐💎 両方集め", solution: "for (let i = 0; i < 3; i++) {\n  robot.move();\n  robot.collect();\n  robot.collectGem();\n}\nrobot.move();" },
+            31: { title: "🔄 6マスループ", solution: "for (let i = 0; i < 6; i++) {\n  robot.move();\n}" },
+            32: { title: "🌀 whileで星集め", solution: "while (robot.x < 5) {\n  robot.move();\n  robot.collect();\n}" },
+            33: { title: "🧱🧱🧱 3つの障害物", solution: "for (let i = 0; i < 3; i++) {\n  robot.jump();\n}\nrobot.move();" },
+            34: { title: "⬇️ ループで下降", solution: "for (let i = 0; i < 2; i++) {\n  robot.move();\n}\nfor (let i = 0; i < 3; i++) {\n  robot.moveDown();\n}" },
+            35: { title: "🔢 変数で星", solution: "let count = 0;\nfor (let i = 0; i < 3; i++) {\n  robot.move();\n  robot.collect();\n  count++;\n}\nrobot.move();" },
+            36: { title: "🔁 while条件", solution: "while (robot.starsCollected < 3) {\n  robot.move();\n  robot.collect();\n}" },
+            37: { title: "💎💎💎💎 4つのジェム", solution: "for (let i = 0; i < 4; i++) {\n  robot.move();\n  robot.collectGem();\n}\nrobot.move();" },
+            38: { title: "📐 四角形パス", solution: "for (let i = 0; i < 2; i++) {\n  robot.move();\n}\nfor (let i = 0; i < 2; i++) {\n  robot.moveUp();\n}" },
+            39: { title: "⭐ 5つの星", solution: "for (let i = 0; i < 5; i++) {\n  robot.move();\n  robot.collect();\n}\nrobot.move();" },
+            40: { title: "🏆 ループマスター", solution: "for (let i = 0; i < 7; i++) {\n  if (robot.x === 2) {\n    robot.jump();\n  } else {\n    robot.move();\n  }\n  robot.collect();\n}" },
+            41: { title: "❓ if文入門", solution: "for (let i = 0; i < 3; i++) {\n  if (robot.isObstacle()) {\n    robot.jump();\n  } else {\n    robot.move();\n  }\n}" },
+            42: { title: "🔀 if-else", solution: "for (let i = 0; i < 4; i++) {\n  if (robot.isObstacle()) {\n    robot.jump();\n  } else {\n    robot.move();\n  }\n}" },
+            43: { title: "⭐ 星チェック", solution: "for (let i = 0; i < 4; i++) {\n  robot.move();\n  if (robot.isStar()) {\n    robot.collect();\n  }\n}" },
+            44: { title: "💎 ジェムチェック", solution: "for (let i = 0; i < 4; i++) {\n  robot.move();\n  if (robot.isGem()) {\n    robot.collectGem();\n  }\n}" },
+            45: { title: "🔀 else if", solution: "for (let i = 0; i < 5; i++) {\n  if (robot.isObstacle()) {\n    robot.jump();\n  } else {\n    robot.move();\n    if (robot.isStar()) {\n      robot.collect();\n    }\n  }\n}" },
+            46: { title: "🎯 ゴールチェック", solution: "while (!robot.isGoal()) {\n  robot.move();\n}" },
+            47: { title: "🧠 AND演算子", solution: "for (let i = 0; i < 5; i++) {\n  robot.move();\n  if (robot.isStar()) {\n    robot.collect();\n  }\n}" },
+            48: { title: "🧠 OR演算子", solution: "for (let i = 0; i < 5; i++) {\n  robot.move();\n  if (robot.isStar() || robot.isGem()) {\n    robot.collect();\n    robot.collectGem();\n  }\n}" },
+            49: { title: "🚫 NOT演算子", solution: "for (let i = 0; i < 4; i++) {\n  if (!robot.isObstacle()) {\n    robot.move();\n  } else {\n    robot.jump();\n  }\n}" },
+            50: { title: "🔄 条件付きループ", solution: "while (robot.x < 6) {\n  if (robot.isObstacle()) {\n    robot.jump();\n  } else {\n    robot.move();\n  }\n}" },
+            51: { title: "⭐💎 両方チェック", solution: "for (let i = 0; i < 5; i++) {\n  robot.move();\n  if (robot.isStar()) robot.collect();\n  if (robot.isGem()) robot.collectGem();\n}" },
+            52: { title: "🧱⭐ 障害物と星", solution: "for (let i = 0; i < 6; i++) {\n  if (robot.isObstacle()) {\n    robot.jump();\n  } else {\n    robot.move();\n  }\n  if (robot.isStar()) robot.collect();\n}" },
+            53: { title: "🔢 カウント条件", solution: "while (robot.starsCollected < 3) {\n  robot.move();\n  if (robot.isStar()) robot.collect();\n}" },
+            54: { title: "📍 位置条件", solution: "for (let i = 0; i < 5; i++) {\n  robot.move();\n  if (robot.x === 2) robot.collect();\n  if (robot.x === 4) robot.collectGem();\n}" },
+            55: { title: "🔀 複合条件", solution: "for (let i = 0; i < 6; i++) {\n  if (robot.isObstacle()) {\n    robot.jump();\n  } else {\n    robot.move();\n  }\n  if (robot.isStar()) robot.collect();\n  if (robot.isGem()) robot.collectGem();\n}" },
+            56: { title: "🎯 ゴールまで収集", solution: "while (!robot.isGoal()) {\n  robot.move();\n  if (robot.isStar()) robot.collect();\n}" },
+            57: { title: "🧱🧱 2障害物条件", solution: "for (let i = 0; i < 5; i++) {\n  if (robot.isObstacle()) {\n    robot.jump();\n  } else {\n    robot.move();\n  }\n}" },
+            58: { title: "⭐⭐⭐⭐ 4つの星", solution: "for (let i = 0; i < 6; i++) {\n  robot.move();\n  if (robot.isStar()) robot.collect();\n}" },
+            59: { title: "🌀 ネスト条件", solution: "for (let i = 0; i < 5; i++) {\n  if (robot.isObstacle()) {\n    robot.jump();\n  } else {\n    robot.move();\n    if (robot.isStar()) robot.collect();\n  }\n}" },
+            60: { title: "🏆 条件マスター", solution: "while (!robot.isGoal()) {\n  if (robot.isObstacle()) {\n    robot.jump();\n  } else {\n    robot.move();\n  }\n  if (robot.isStar()) robot.collect();\n  if (robot.isGem()) robot.collectGem();\n}" },
+            61: { title: "⚙️ 関数入門", solution: "function moveOnce() {\n  robot.move();\n}\n\nmoveOnce();\nmoveOnce();\nmoveOnce();" },
+            62: { title: "⚙️ moveTwo関数", solution: "function moveTwo() {\n  robot.move();\n  robot.move();\n}\n\nmoveTwo();\nmoveTwo();" },
+            63: { title: "📦 引数入門", solution: "function moveN(n) {\n  for (let i = 0; i < n; i++) {\n    robot.move();\n  }\n}\n\nmoveN(4);" },
+            64: { title: "⭐ 収集関数", solution: "function moveAndCollect() {\n  robot.move();\n  robot.collect();\n}\n\nmoveAndCollect();\nmoveAndCollect();\nmoveAndCollect();" },
+            65: { title: "🧱 ジャンプ関数", solution: "function handleMove() {\n  if (robot.isObstacle()) {\n    robot.jump();\n  } else {\n    robot.move();\n  }\n}\n\nfor (let i = 0; i < 4; i++) {\n  handleMove();\n}" },
+            66: { title: "🔙 return入門", solution: "function getX() {\n  return robot.x;\n}\n\nwhile (getX() < 4) {\n  robot.move();\n}" },
+            67: { title: "🔢 カウント関数", solution: "function collectAndCount() {\n  robot.move();\n  robot.collect();\n  return robot.starsCollected;\n}\n\nfor (let i = 0; i < 3; i++) {\n  collectAndCount();\n}" },
+            68: { title: "⚙️⚙️ 2つの関数", solution: "function goRight() {\n  robot.move();\n}\n\nfunction goUp() {\n  robot.moveUp();\n}\n\ngoRight();\ngoRight();\ngoUp();\ngoUp();" },
+            69: { title: "📦 複数引数", solution: "function moveXY(x, y) {\n  for (let i = 0; i < x; i++) robot.move();\n  for (let i = 0; i < y; i++) robot.moveUp();\n}\n\nmoveXY(3, 2);" },
+            70: { title: "🎯 条件付き関数", solution: "function smartMove() {\n  if (robot.isObstacle()) {\n    robot.jump();\n  } else {\n    robot.move();\n  }\n}\n\nfor (let i = 0; i < 5; i++) {\n  smartMove();\n}" },
+            71: { title: "⭐ 収集チェック関数", solution: "function tryCollect() {\n  if (robot.isStar()) robot.collect();\n}\n\nfor (let i = 0; i < 5; i++) {\n  robot.move();\n  tryCollect();\n}" },
+            72: { title: "💎 ジェム収集関数", solution: "function tryCollectGem() {\n  if (robot.isGem()) robot.collectGem();\n}\n\nfor (let i = 0; i < 5; i++) {\n  robot.move();\n  tryCollectGem();\n}" },
+            73: { title: "🔀 分岐関数", solution: "function step() {\n  if (robot.isObstacle()) {\n    robot.jump();\n  } else {\n    robot.move();\n  }\n  if (robot.isStar()) robot.collect();\n  if (robot.isGem()) robot.collectGem();\n}\n\nfor (let i = 0; i < 5; i++) step();" },
+            74: { title: "🔁 ループ関数", solution: "function moveMany(n) {\n  for (let i = 0; i < n; i++) {\n    robot.move();\n  }\n}\n\nmoveMany(5);" },
+            75: { title: "🔙 bool関数", solution: "function canCollect() {\n  return robot.isStar() || robot.isGem();\n}\n\nfor (let i = 0; i < 5; i++) {\n  robot.move();\n  if (canCollect()) {\n    robot.collect();\n    robot.collectGem();\n  }\n}" },
+            76: { title: "⚙️⚙️⚙️ 3つの関数", solution: "function handleObstacle() {\n  if (robot.isObstacle()) robot.jump();\n  else robot.move();\n}\nfunction collectStar() {\n  if (robot.isStar()) robot.collect();\n}\nfunction collectGem() {\n  if (robot.isGem()) robot.collectGem();\n}\n\nfor (let i = 0; i < 6; i++) {\n  handleObstacle();\n  collectStar();\n  collectGem();\n}" },
+            77: { title: "🎯 ゴール関数", solution: "function goToGoal() {\n  while (!robot.isGoal()) {\n    robot.move();\n  }\n}\n\ngoToGoal();" },
+            78: { title: "🌀 再帰的思考", solution: "function step() {\n  if (robot.isObstacle()) robot.jump();\n  else robot.move();\n  if (robot.isStar()) robot.collect();\n}\n\nfunction run() {\n  for (let i = 0; i < 5; i++) step();\n}\n\nrun();" },
+            79: { title: "📊 統計関数", solution: "function getTotal() {\n  return robot.starsCollected + robot.gemsCollected;\n}\n\nfor (let i = 0; i < 5; i++) {\n  robot.move();\n  robot.collect();\n  robot.collectGem();\n}" },
+            80: { title: "🏆 マスターチャレンジ", solution: "function smartMove() {\n  if (robot.isObstacle()) robot.jump();\n  else robot.move();\n}\n\nfunction collectAll() {\n  if (robot.isStar()) robot.collect();\n  if (robot.isGem()) robot.collectGem();\n}\n\nwhile (!robot.isGoal()) {\n  smartMove();\n  collectAll();\n}" },
+            // WORLD 5: デバッグ (81-100)
+            81: { title: "🐛 バグ修正1: タイプミス", solution: "robot.move();\nrobot.move();\nrobot.move();" },
+            82: { title: "🐛 バグ修正2: 回数不足", solution: "robot.move();\nrobot.move();\nrobot.move();\nrobot.move();\nrobot.move();" },
+            83: { title: "🐛 バグ修正3: 間違った関数", solution: "robot.move();\nrobot.move();\nrobot.moveUp();" },
+            84: { title: "🐛 バグ修正4: forループ", solution: "for (let i = 0; i < 6; i++) {\n  robot.move();\n}" },
+            85: { title: "🐛 バグ修正5: セミコロン忘れ", solution: "robot.move();\nrobot.move();\nrobot.move();\nrobot.move();" },
+            86: { title: "🐛 バグ修正6: 括弧忘れ", solution: "robot.move();\nrobot.move();\nrobot.move();" },
+            87: { title: "🐛 バグ修正7: 星を忘れた", solution: "robot.move();\nrobot.move();\nrobot.collect();\nrobot.move();\nrobot.move();" },
+            88: { title: "🐛 バグ修正8: while条件", solution: "while (robot.x < 5) {\n  robot.move();\n}" },
+            89: { title: "🐛 バグ修正9: 障害物衝突", solution: "robot.move();\nrobot.move();\nrobot.moveUp();\nrobot.move();\nrobot.moveDown();\nrobot.move();\nrobot.move();" },
+            90: { title: "🐛 バグ修正10: 順序間違い", solution: "robot.move();\nrobot.move();\nrobot.collect();\nrobot.move();" },
+            91: { title: "🐛 バグ修正11: 無限ループ", solution: "let count = 0;\nwhile (count < 4) {\n  robot.move();\n  count++;\n}" },
+            92: { title: "🐛 バグ修正12: if条件", solution: "for (let i = 0; i < 5; i++) {\n  robot.move();\n  if (robot.x === 3) {\n    robot.collect();\n  }\n}" },
+            93: { title: "🐛 バグ修正13: 変数名", solution: "for (let i = 0; i < 4; i++) {\n  robot.move();\n}\nrobot.move();\nrobot.move();" },
+            94: { title: "🐛 バグ修正14: 宝石忘れ", solution: "robot.move();\nrobot.move();\nrobot.collectGem();\nrobot.move();\nrobot.move();\nrobot.collectGem();\nrobot.move();" },
+            95: { title: "🐛 バグ修正15: 関数呼び出し", solution: "function move3() {\n  robot.move();\n  robot.move();\n  robot.move();\n}\n\nmove3();\nmove3();" },
+            96: { title: "🐛 バグ修正16: 中括弧", solution: "for (let i = 0; i < 4; i++) {\n  robot.move();\n  robot.collect();\n}" },
+            97: { title: "🐛 バグ修正17: Off-by-one", solution: "for (let i = 0; i < 5; i++) {\n  robot.move();\n}" },
+            98: { title: "🐛 バグ修正18: ロジックエラー", solution: "robot.move();\nrobot.move();\nrobot.moveUp();\nrobot.move();\nrobot.moveDown();\nrobot.move();" },
+            99: { title: "🐛 バグ修正19: 複合バグ", solution: "for (let i = 0; i < 4; i++) {\n  robot.move();\n}\nrobot.collect();" },
+            100: { title: "🐛 バグ修正20: 総合問題", solution: "robot.move();\nrobot.move();\nrobot.collect();\nrobot.move();\nrobot.move();\nif (robot.x === 4) {\n  robot.collectGem();\n}\nrobot.move();" }
+        };
+        
+        // Generate levels HTML
+        function generateLevels() {
+            const container = document.getElementById('levelsContainer');
+            const worlds = [
+                { name: "🌍 ワールド1: 基礎", range: [1, 20], color: "#00f5ff" },
+                { name: "🔁 ワールド2: ループ", range: [21, 40], color: "#00ff88" },
+                { name: "🔀 ワールド3: 条件分岐", range: [41, 60], color: "#ffcc00" },
+                { name: "⚙️ ワールド4: 関数", range: [61, 80], color: "#b14eff" },
+                { name: "🐛 ワールド5: デバッグ", range: [81, 100], color: "#ff2d75" }
+            ];
+            
+            worlds.forEach(world => {
+                const worldDiv = document.createElement('div');
+                worldDiv.className = 'world-section';
+                worldDiv.innerHTML = `<div class="world-header" style="border-left-color: ${world.color}">${world.name}（レベル${world.range[0]}-${world.range[1]}）</div>`;
+                
+                for (let i = world.range[0]; i <= world.range[1]; i++) {
+                    const level = levelSolutions[i];
+                    if (!level) continue;
+                    
+                    const card = document.createElement('div');
+                    card.className = 'level-card';
+                    card.innerHTML = `
+                        <div class="level-header" onclick="this.parentElement.classList.toggle('open')">
+                            <div class="level-title">
+                                <span class="level-number">${i}</span>
+                                <span>${level.title}</span>
+                            </div>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="level-content">
+                            <div class="code-label">
+                                ✅ 模範解答
+                                <button class="copy-btn" onclick="copyCode(this)">コピー</button>
+                            </div>
+                            <div class="code-block">
+                                <pre>${level.solution}</pre>
+                            </div>
+                        </div>
+                    `;
+                    worldDiv.appendChild(card);
+                }
+                
+                container.appendChild(worldDiv);
+            });
+        }
+        
+        // Tab navigation
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.section).classList.add('active');
+            });
+        });
+        
+        // Copy code function
+        function copyCode(btn) {
+            const codeBlock = btn.closest('.level-content, .syntax-card').querySelector('pre');
+            navigator.clipboard.writeText(codeBlock.textContent).then(() => {
+                const originalText = btn.textContent;
+                btn.textContent = 'コピー完了!';
+                btn.style.background = 'var(--accent-success)';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '';
+                }, 2000);
+            });
+        }
+        
+        // Initialize
+        generateLevels();
+    </script>
+</body>
+</html>
